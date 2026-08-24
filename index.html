@@ -1,0 +1,2024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YahKnowBacklog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1F2023;
+    --paper:#ECE3CC;
+    --paper-line:rgba(20,24,31,0.14);
+    --outline:rgba(255,255,255,0.38);
+    --gold:#C9A227;
+    --amber:#C9862B;
+    --green:#3F7D5C;
+    --red:#B23A3A;
+    --slate:#4C5B73;
+    --pc:#6C6C6C;
+    /* shell theme (header/hero/shelves) — light default */
+    --sh-bg:#FAF6EF; --sh-card:#FFFFFF; --sh-text:#211D18; --sh-muted:#8A8071;
+    --sh-line:rgba(33,29,24,0.12); --sh-line-strong:rgba(33,29,24,0.28);
+    --sh-accent:#C9862B; --sh-danger:#B23A3A; --sh-fill:#211D18;
+  }
+  html[data-shell="dark"]{
+    --sh-bg:#15171D; --sh-card:#1E222A; --sh-text:#ECEEF1; --sh-muted:#8F97A6;
+    --sh-line:rgba(255,255,255,0.2); --sh-line-strong:rgba(255,255,255,0.35);
+    --sh-accent:#C9862B; --sh-danger:#D9645F; --sh-fill:#0A0C10;
+  }
+  html[data-shell="retro"]{
+    --sh-bg:#DAD8DC; --sh-card:#F1EFEA; --sh-text:#2B2438; --sh-muted:#6B6478;
+    --sh-line:#000000; --sh-line-strong:#000000;
+    --sh-accent:#C9862B; --sh-danger:#B23A3A; --sh-fill:#2B2438;
+  }
+  html[data-shell="retro"] .shell-pixel{border:3px solid #000 !important;box-shadow:4px 4px 0 #000 !important;border-radius:0 !important;}
+  html[data-shell="retro"] .shell-title,
+  html[data-shell="retro"] .shelf-title{font-family:'Press Start 2P',monospace;letter-spacing:.02em;}
+  html[data-shell="retro"] h1.shell-title{font-size:17px;}
+  html[data-shell="retro"] .shelf-title{font-size:11px;}
+  html[data-shell="retro"] .shelf-ledge{
+    height:20px;margin:-3px 0 0;position:relative;
+    background:linear-gradient(180deg,#C89B65 0%,#A97C46 14%,#8B5E33 55%,#6E4726 100%),
+      repeating-linear-gradient(90deg,rgba(0,0,0,0.12) 0 2px,transparent 2px 18px);
+    border:3px solid #000;border-top:3px solid #E0B77E;box-shadow:4px 4px 0 #000;
+  }
+  .shelf-ledge{height:0;margin:0;}
+
+  .deco-layer{display:none;position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+  html[data-shell="retro"] .deco-layer{display:block;}
+  .deco-item{position:absolute;opacity:.14;}
+
+  .shell-wrap{max-width:640px;margin:0 auto;padding:24px 20px 100px;position:relative;z-index:1;}
+  .shell-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
+  h1.shell-title{font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:700;margin:0;color:var(--sh-text);}
+  .shell-icons{display:flex;align-items:center;gap:2px;}
+  .shell-icon-btn{background:none;border:none;color:var(--sh-muted);cursor:pointer;padding:7px;position:relative;border-radius:6px;}
+  .shell-icon-btn:hover{color:var(--sh-text);}
+  .shell-icon-btn .tip{position:absolute;top:110%;right:0;background:var(--sh-fill);color:#fff;font-size:11px;padding:4px 8px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;z-index:5;}
+  .shell-icon-btn:hover .tip{opacity:1;}
+
+  .shell-toprow{display:flex;gap:8px;margin-bottom:16px;}
+  .shell-filecard-btn{flex-shrink:0;font-size:13px;font-weight:500;padding:9px 14px;border-radius:8px;border:1px solid var(--sh-line);background:var(--sh-card);color:var(--sh-text);cursor:pointer;}
+  .shell-search{flex:1;min-width:0;background:var(--sh-card);color:var(--sh-text);border:1px solid var(--sh-line);}
+
+  .shell-chiprow{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:22px;}
+  .shell-chip{flex-shrink:0;font-size:12px;padding:6px 14px;border-radius:999px;border:1px solid var(--sh-line);background:var(--sh-card);cursor:pointer;color:var(--sh-muted);white-space:nowrap;}
+  .shell-chip.active{background:var(--sh-fill);color:#fff;border-color:var(--sh-line-strong);}
+  .shell-retro-menu{background:var(--sh-card);border:1px solid var(--sh-line);border-radius:10px;padding:6px;min-width:150px;max-height:280px;overflow-y:auto;box-shadow:0 6px 16px rgba(0,0,0,0.18);}
+  .shell-retro-item{display:block;width:100%;text-align:left;padding:7px 10px;font-size:12px;border:none;background:none;color:var(--sh-text);cursor:pointer;border-radius:6px;}
+  .shell-retro-item:hover{background:var(--sh-bg);}
+  .shell-retro-item.active{font-weight:600;color:var(--sh-accent);}
+
+  .shell-hero{background:var(--sh-card);border-radius:16px;padding:16px;margin-bottom:24px;box-shadow:0 1px 3px rgba(0,0,0,0.05);border:1px solid var(--sh-line);}
+  .shell-hero-top{display:flex;gap:14px;}
+  .shell-hero-cover{width:76px;height:100px;border-radius:10px;flex-shrink:0;object-fit:cover;background:var(--sh-bg);}
+  .shell-hero-label{font-size:11px;color:var(--sh-muted);text-transform:uppercase;letter-spacing:.06em;margin:0 0 4px;}
+  .shell-hero-title{font-family:'Space Grotesk',sans-serif;font-size:19px;margin:0 0 4px;color:var(--sh-text);}
+  .shell-hero-meta{font-size:12px;color:var(--sh-muted);margin:0 0 8px;}
+  .shell-hero-stars{color:var(--sh-accent);font-size:14px;letter-spacing:2px;}
+  .shell-hero-actions{display:flex;gap:8px;margin-top:12px;}
+  .shell-hero-btn{flex:1;font-size:12px;font-weight:500;padding:9px;border-radius:8px;border:1px solid var(--sh-line);background:var(--sh-bg);cursor:pointer;color:var(--sh-text);}
+  .shell-hero-btn.primary{background:var(--sh-fill);color:#fff;border-color:var(--sh-line-strong);}
+
+  .shell-shelf{margin-bottom:28px;}
+  .shell-shelf-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px;}
+  .shelf-title{font-size:15px;font-weight:600;margin:0;color:var(--sh-text);}
+  .shell-count{font-size:12px;color:var(--sh-muted);}
+  .shell-shelf-controls{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+  select.shell-sort{font-size:11px;color:var(--sh-muted);border:none;background:none;cursor:pointer;}
+  .shell-seeall{font-size:12px;color:var(--sh-muted);background:none;border:none;cursor:pointer;text-decoration:underline;}
+  .shell-surprise{font-size:11px;color:var(--sh-accent);background:none;border:1px solid var(--sh-accent);border-radius:999px;padding:4px 10px;cursor:pointer;}
+  .shell-scroll{display:flex;gap:12px;overflow-x:auto;overflow-y:visible;padding:16px 2px 6px;}
+  .shell-card{width:104px;flex-shrink:0;cursor:pointer;transition:transform .2s cubic-bezier(.34,1.56,.64,1);}
+  .shell-card:hover{transform:translateY(-8px) scale(1.07);z-index:5;position:relative;}
+  .shell-card-cover{width:104px;height:138px;border-radius:10px;position:relative;background-size:cover;background-position:center;}
+  .shell-card-fallback{display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:24px;color:#fff;}
+  .shell-stamp{position:absolute;top:6px;right:6px;font-size:9px;padding:2px 6px;border-radius:20px;background:rgba(255,255,255,0.92);color:var(--sh-bg);}
+  .shell-card-title{font-size:12px;font-weight:500;margin:6px 0 3px;line-height:1.25;color:var(--sh-text);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+  .shell-card-meta{display:flex;align-items:center;gap:5px;}
+  .shell-card-dot{width:6px;height:6px;border-radius:50%;}
+  .shell-card-stars{font-size:10px;color:var(--sh-accent);}
+  .shell-full-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .shell-full-grid .shell-card{width:100%;}
+  .shell-full-grid .shell-card-cover{width:100%;height:auto;aspect-ratio:3/4;}
+
+  .shell-fab{position:fixed;bottom:24px;right:24px;width:52px;height:52px;border-radius:50%;background:var(--sh-fill);color:#fff;border:1px solid var(--sh-line-strong);font-size:26px;box-shadow:0 4px 14px rgba(0,0,0,0.35);cursor:pointer;z-index:2;}
+
+  .heart-btn{background:none;border:none;font-size:34px;color:var(--ink);opacity:.3;cursor:pointer;line-height:1;transition:color .2s,opacity .2s;}
+  .heart-btn.filled{color:var(--red);opacity:1;}
+  .heart-btn.pulse{animation:heartPulse .26s ease;}
+  @keyframes heartPulse{0%{transform:scale(1);}45%{transform:scale(1.35);}100%{transform:scale(1);}}
+  .heart-msg{font-family:'Space Grotesk',sans-serif;font-size:15px;margin:8px 0 0;max-height:0;opacity:0;overflow:hidden;transition:max-height .3s ease,opacity .3s ease;color:var(--ink);}
+  .heart-msg.shown{max-height:40px;opacity:1;}
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--sh-bg);
+    min-height:100vh;
+    font-family:'Space Grotesk', system-ui, sans-serif;
+    color:var(--sh-text);
+    transition:background .2s,color .2s;
+  }
+  .mono{font-family:'IBM Plex Mono', ui-monospace, monospace;}
+  .wrap{max-width:1000px;margin:0 auto;padding:40px 20px 100px;}
+  header{margin-bottom:32px;}
+  .eyebrow{font-size:11px;letter-spacing:0.25em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+  h1{font-size:34px;font-weight:700;margin:0;color:var(--paper);}
+  .sub{color:rgba(255,255,255,0.55);font-size:14px;margin-top:6px;}
+
+  .pillrow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;}
+  .pill{
+    font-size:11px;text-transform:uppercase;letter-spacing:0.04em;
+    border-radius:999px;padding:6px 12px;border:1px solid;
+    background:transparent;cursor:pointer;transition:transform .1s ease;
+  }
+  .pill:hover{transform:translateY(-1px);}
+  .pill.all-active{background:var(--paper);color:var(--ink);border-color:transparent;}
+  .pill.all{border-color:var(--outline);color:var(--paper);}
+
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:24px;}
+  .search-box{position:relative;flex:1;min-width:200px;}
+  .search-box svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);opacity:.4;}
+  input,select,textarea{
+    font-family:'Space Grotesk', sans-serif;
+    border:1px solid var(--paper-line);
+    border-radius:3px;
+    padding:9px 12px;
+    font-size:14px;
+    background:#fff;
+    color:var(--ink);
+  }
+  .search-box input{width:100%;padding-left:34px;background:var(--paper);}
+  select.platform-filter{background:var(--paper);font-family:'IBM Plex Mono',monospace;font-size:12px;text-transform:uppercase;}
+  .btn{
+    display:inline-flex;align-items:center;gap:6px;
+    border-radius:3px;padding:9px 14px;font-size:14px;font-weight:500;
+    border:1px solid transparent;cursor:pointer;font-family:'Space Grotesk',sans-serif;
+    white-space:nowrap;
+  }
+  .btn-ghost{background:transparent;border-color:var(--outline);color:var(--paper);}
+  .btn-amber{background:var(--amber);color:var(--ink);font-weight:600;}
+  .btn-ink{background:var(--ink);color:#fff;}
+  .btn-outline{background:transparent;border:1px solid rgba(20,24,31,0.2);color:var(--ink);}
+
+  .error-msg{color:var(--red);font-size:12px;margin-bottom:16px;}
+  .empty{
+    color:var(--sh-muted);font-size:14px;
+    border:1px dashed var(--sh-line);border-radius:3px;
+    padding:40px;text-align:center;
+  }
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(240px,1fr));gap:24px;padding-top:8px;}
+
+  .card{
+    position:relative;text-align:left;width:100%;border-radius:3px;overflow:hidden;
+    background:var(--paper);border:1px solid var(--paper-line);
+    box-shadow:3px 4px 0 rgba(20,24,31,0.18);
+    cursor:pointer;transition:transform .12s ease, box-shadow .12s ease;
+    padding:0;font-family:'Space Grotesk',sans-serif;
+  }
+  .card:hover{transform:translateY(-3px);box-shadow:4px 6px 0 rgba(20,24,31,0.22);}
+  .card-body{position:relative;padding:14px 16px 16px;}
+  .card-top{display:flex;align-items:flex-start;gap:12px;padding-right:78px;}
+  .card-thumb{width:50px;height:50px;border-radius:4px;object-fit:cover;flex-shrink:0;border:1px solid var(--paper-line);background:#fff;}
+  .card-thumb-fallback{
+    width:50px;height:50px;border-radius:4px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:18px;color:#fff;
+  }
+  .callnum{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.05em;color:rgba(20,24,31,0.5);margin-bottom:3px;}
+  .stamp{
+    position:absolute;top:12px;right:12px;
+    font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;
+    text-transform:uppercase;letter-spacing:.11em;
+    border:2px solid;border-radius:4px;padding:2px 9px;
+    transform:rotate(-7deg);pointer-events:none;
+  }
+  .card-title{font-size:20px;font-weight:700;color:var(--ink);line-height:1.25;word-break:break-word;}
+  .card-sub{font-family:'IBM Plex Mono',monospace;font-size:12px;color:rgba(20,24,31,0.5);margin-top:3px;}
+  .card-plat{display:flex;align-items:center;gap:8px;margin-top:9px;}
+  .dot{width:8px;height:8px;border-radius:50%;}
+  .card-plat span{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.03em;text-transform:uppercase;color:rgba(20,24,31,0.6);}
+  .card-notes{font-size:13px;color:rgba(20,24,31,0.55);margin-top:7px;font-style:italic;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+
+  /* Modal */
+  .overlay{
+    position:fixed;inset:0;background:rgba(10,12,16,0.65);
+    display:flex;align-items:center;justify-content:center;padding:20px;z-index:50;
+  }
+  .modal{
+    background:var(--paper);border-radius:4px;padding:20px;
+    width:100%;max-width:440px;max-height:90vh;overflow-y:auto;
+    font-family:'Space Grotesk',sans-serif;color:var(--ink);
+  }
+  .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .modal-head h2{font-size:20px;margin:0;}
+  .close-x{background:none;border:none;cursor:pointer;color:rgba(20,24,31,0.5);padding:4px;}
+  .close-x:hover{color:var(--ink);}
+  label.field-label{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:rgba(20,24,31,0.5);display:block;margin-bottom:4px;}
+  .full{width:100%;}
+  .mb3{margin-bottom:12px;}
+  .mb4{margin-bottom:16px;}
+  .chiprow{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.03em;
+    border:1px solid;border-radius:999px;padding:5px 12px;background:transparent;cursor:pointer;color:var(--ink);
+  }
+  .chip-group-label{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:rgba(20,24,31,0.4);margin:10px 0 6px;}
+  .chip-scroll{max-height:150px;overflow-y:auto;border:1px solid var(--paper-line);border-radius:4px;background:#fff;padding:8px;}
+  textarea{resize:none;width:100%;}
+  .form-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:16px;}
+  .star-picker{display:flex;gap:2px;}
+  .star-btn{background:none;border:none;cursor:pointer;font-size:24px;line-height:1;color:rgba(20,24,31,0.22);padding:2px 3px;}
+  .star-btn.filled{color:var(--amber);}
+  .card-rating{margin-top:6px;font-size:17px;letter-spacing:2px;}
+  .card-rating .filled-star{color:var(--amber);}
+  .card-rating .empty-star{color:rgba(20,24,31,0.18);}
+  .card-hours{font-size:12px;color:rgba(20,24,31,0.5);letter-spacing:0;vertical-align:middle;}
+  .delete-link{background:none;border:none;color:var(--red);display:flex;align-items:center;gap:5px;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:14px;padding:0;}
+
+  .gamesearch{margin-bottom:16px;position:relative;}
+  .gs-input-wrap{position:relative;}
+  .gs-input-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.4;}
+  .gs-input{width:100%;padding-left:32px;background:#fff;}
+  .gs-results{
+    margin-top:6px;border:1px solid var(--paper-line);border-radius:3px;
+    background:#fff;max-height:220px;overflow-y:auto;
+  }
+  .gs-result{
+    width:100%;display:flex;align-items:center;gap:10px;
+    padding:8px 10px;text-align:left;background:none;border:none;border-bottom:1px solid var(--paper-line);
+    cursor:pointer;font-family:'Space Grotesk',sans-serif;
+  }
+  .gs-result:last-child{border-bottom:none;}
+  .gs-result:hover{background:rgba(20,24,31,0.04);}
+  .gs-swatch{width:34px;height:34px;border-radius:3px;flex-shrink:0;}
+  .gs-name{font-size:13px;font-weight:500;color:var(--ink);}
+  .gs-meta{font-family:'IBM Plex Mono',monospace;font-size:10px;color:rgba(20,24,31,0.45);}
+  .gs-hint{font-size:10px;color:rgba(20,24,31,0.4);margin-top:6px;}
+
+  .random-modal{text-align:center;padding:8px 0;}
+  .random-label{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:rgba(20,24,31,0.5);margin-bottom:10px;}
+  .random-title{font-size:22px;font-weight:700;color:var(--ink);margin-bottom:8px;}
+  .random-plat{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:22px;}
+  .random-actions{display:flex;gap:8px;justify-content:center;}
+
+  .sync-pill{
+    display:inline-flex;align-items:center;gap:6px;
+    font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.04em;
+    border:1px solid var(--outline);border-radius:999px;padding:6px 12px;
+    background:transparent;color:var(--paper);cursor:pointer;margin-top:14px;
+  }
+  .sync-pill .dot-live{width:6px;height:6px;border-radius:50%;background:var(--green);}
+  .sync-section{margin-bottom:18px;}
+  .sync-section:last-child{margin-bottom:0;}
+  .sync-code-box{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    background:#fff;border:1px solid var(--paper-line);border-radius:3px;
+    padding:10px 12px;font-family:'IBM Plex Mono',monospace;font-size:15px;letter-spacing:.05em;
+  }
+  .copy-btn{background:none;border:none;cursor:pointer;color:var(--ink);opacity:.6;padding:2px;}
+  .copy-btn:hover{opacity:1;}
+  .sync-status{font-family:'IBM Plex Mono',monospace;font-size:11px;margin-top:8px;}
+  .sync-status.ok{color:var(--green);}
+  .sync-status.err{color:var(--red);}
+  .sync-status.pending{color:rgba(20,24,31,0.5);}
+  .sync-hint{font-size:12px;color:rgba(20,24,31,0.55);margin-top:6px;line-height:1.4;}
+  .sync-divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:rgba(20,24,31,0.35);font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.1em;}
+  .sync-divider::before,.sync-divider::after{content:"";flex:1;height:1px;background:rgba(20,24,31,0.12);}
+  .sync-row{display:flex;gap:8px;}
+  .sync-row input{flex:1;}
+  .config-textarea{width:100%;font-family:'IBM Plex Mono',monospace;font-size:11px;background:#fff;border:1px solid var(--paper-line);border-radius:3px;padding:10px;resize:vertical;}
+  .live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:5px;}
+  .link-btn{background:none;border:none;color:rgba(20,24,31,0.5);text-decoration:underline;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:12px;padding:0;}
+
+  .hidden{display:none !important;}
+
+  @media (max-width:600px){
+    .overlay{align-items:flex-end;padding:0;}
+    .modal{max-width:none;border-radius:16px 16px 0 0;max-height:88vh;}
+  }
+</style>
+</head>
+<body>
+
+<div class="deco-layer">
+  <svg class="deco-item" style="top:8%;left:6%;transform:rotate(-14deg);" width="34" height="22" viewBox="0 0 34 22" fill="none"><rect x="1" y="1" width="32" height="20" rx="2" stroke="var(--slate)" stroke-width="2"/><circle cx="10" cy="11" r="5" stroke="var(--slate)" stroke-width="2"/><circle cx="24" cy="11" r="5" stroke="var(--slate)" stroke-width="2"/><rect x="13" y="9" width="8" height="4" stroke="var(--slate)" stroke-width="1.5"/></svg>
+  <svg class="deco-item" style="top:6%;right:8%;transform:rotate(10deg);" width="30" height="30" viewBox="0 0 30 30" fill="none"><rect x="1" y="1" width="28" height="28" rx="1" stroke="var(--green)" stroke-width="2"/><rect x="6" y="1" width="14" height="9" stroke="var(--green)" stroke-width="2"/><rect x="6" y="19" width="18" height="8" stroke="var(--green)" stroke-width="1.5"/></svg>
+  <svg class="deco-item" style="top:28%;left:3%;transform:rotate(6deg);" width="26" height="26" viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="11" stroke="var(--amber)" stroke-width="2"/><circle cx="13" cy="13" r="3" stroke="var(--amber)" stroke-width="2"/></svg>
+  <svg class="deco-item" style="top:34%;right:5%;transform:rotate(-8deg);" width="40" height="16" viewBox="0 0 40 16" fill="none"><path d="M1 8 Q6 1 11 8 T21 8 T31 8 T39 8" stroke="var(--red)" stroke-width="2.5" fill="none"/></svg>
+  <svg class="deco-item" style="top:55%;left:5%;transform:rotate(-10deg);" width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="9" y="1" width="10" height="26" rx="2" stroke="var(--slate)" stroke-width="2"/><rect x="1" y="9" width="26" height="10" rx="2" stroke="var(--slate)" stroke-width="2"/><circle cx="21" cy="6" r="2" fill="var(--slate)"/><circle cx="21" cy="22" r="2" fill="var(--slate)"/></svg>
+  <svg class="deco-item" style="top:62%;right:7%;transform:rotate(16deg);" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 1L14.7 8.6H22.7L16.1 13.3L18.5 21L12 16.2L5.5 21L7.9 13.3L1.3 8.6H9.3Z" stroke="var(--amber)" stroke-width="1.8"/></svg>
+  <svg class="deco-item" style="bottom:14%;left:8%;transform:rotate(-6deg);" width="24" height="24" viewBox="0 0 24 24" fill="none"><polygon points="12,1 23,21 1,21" stroke="var(--green)" stroke-width="2"/></svg>
+</div>
+
+<div class="shell-wrap">
+  <div class="shell-header">
+    <h1 class="shell-title">YahKnowBacklog</h1>
+    <div class="shell-icons">
+      <button class="shell-icon-btn" id="themeBtn" aria-label="Toggle theme"><span id="themeIcon">&#9788;</span><span class="tip">Theme</span></button>
+      <button class="shell-icon-btn" id="syncPillBtn" aria-label="Settings">&#9881;<span class="tip">Settings</span></button>
+    </div>
+  </div>
+  <p style="color:var(--sh-muted);font-size:13px;margin:0 0 18px;">Should of, Could of, Would of, now simplified into a small list.</p>
+
+  <div class="shell-toprow">
+    <button class="shell-filecard-btn shell-pixel" id="addBtn">+ File a card</button>
+    <input id="searchInput" class="shell-search shell-pixel" placeholder="Search the catalog…">
+  </div>
+
+  <div class="shell-chiprow" id="chipRow"></div>
+  <div id="retroMenuRoot"></div>
+
+  <div class="error-msg hidden" id="errorMsg"></div>
+
+  <div id="heroArea"></div>
+  <div id="shelvesArea"></div>
+</div>
+
+
+<!-- Add/Edit Modal -->
+<div class="overlay hidden" id="formOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="formTitle">File a new card</h2>
+      <button class="close-x" id="formClose">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="gamesearch">
+      <div class="gs-input-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#14181F" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="gsInput" class="gs-input" placeholder="Search known titles…">
+      </div>
+      <div id="gsResults" class="gs-results hidden"></div>
+      <div class="gs-hint">Pulls from a built-in list of popular titles — works offline. Can't find it? Just type the title below.</div>
+    </div>
+
+    <label class="field-label">Title</label>
+    <input id="titleInput" class="full mb3" placeholder="e.g. Elden Ring">
+
+    <label class="field-label">Platform</label>
+    <div class="chip-group-label">Current</div>
+    <div class="chiprow mb3" id="platformChipsCurrent"></div>
+    <div class="chip-group-label">Retro (pre-PS5)</div>
+    <div class="chip-scroll mb3">
+      <div class="chiprow" id="platformChipsRetro"></div>
+    </div>
+
+    <label class="field-label">Year (optional)</label>
+    <input id="yearInput" type="number" min="1970" max="2100" class="full mb3" placeholder="e.g. 2023 — helps find the right cover art for remakes/sequels with the same name">
+
+    <label class="field-label">Status</label>
+    <div class="chiprow mb3" id="statusChips"></div>
+
+    <label class="field-label">Your Rating</label>
+    <div class="star-picker mb3" id="ratingPicker"></div>
+
+    <label class="field-label">Hours Played (optional)</label>
+    <input id="hoursInput" type="number" min="0" step="0.5" class="full mb3" placeholder="e.g. 42">
+
+    <label class="field-label">Cover image URL (optional)</label>
+    <input id="coverInput" class="full mb3" placeholder="https://…">
+
+    <label class="field-label">Notes</label>
+    <textarea id="notesInput" class="mb4" rows="2" placeholder="Optional — why it's on the shelf"></textarea>
+
+    <div class="form-actions">
+      <button class="delete-link hidden" id="deleteBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
+        Delete
+      </button>
+      <div style="flex:1"></div>
+      <button class="btn btn-outline" id="cancelBtn">Cancel</button>
+      <button class="btn btn-ink" id="saveBtn">File card</button>
+    </div>
+  </div>
+</div>
+
+<!-- Random pick Modal -->
+<div class="overlay hidden" id="randomOverlay">
+  <div class="modal random-modal">
+    <div class="random-label">Tonight's pick</div>
+    <div class="random-title" id="randomTitle"></div>
+    <div class="random-plat">
+      <span class="dot" id="randomDot"></span>
+      <span class="mono" id="randomPlat" style="font-size:11px;text-transform:uppercase;color:rgba(20,24,31,.6);"></span>
+    </div>
+    <div class="random-actions">
+      <button class="btn btn-outline" id="pullAgainBtn">Pull again</button>
+      <button class="btn btn-ink" id="closeRandomBtn">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Full shelf grid modal ("See all") -->
+<div class="overlay hidden" id="fullGridOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="fullGridTitle">Shelf</h2>
+      <button class="close-x" id="fullGridClose">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div id="fullGridBody"></div>
+  </div>
+</div>
+
+<!-- Sync Modal (also serves as Settings) -->
+<div class="overlay hidden" id="syncOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>Settings</h2>
+      <button class="close-x" id="syncClose">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div style="text-align:center;padding:2px 0 14px;">
+      <button id="heartBtn" class="heart-btn">&#9825;</button>
+      <p id="heartMsg" class="heart-msg"></p>
+    </div>
+    <div id="syncBody"></div>
+    <input type="file" id="importFileInput" accept="application/json" class="hidden">
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script>
+const CURRENT_PLATFORMS = ["PS5","Switch","Xbox","PC"];
+const RETRO_PLATFORMS = [
+  "PS4","PS3","PS2","PS1",
+  "Xbox 360","Xbox One","Xbox (Original)",
+  "GameCube","Wii U","Wii",
+  "N64","SNES","NES",
+  "Game Boy Advance","Game Boy","DS","3DS",
+  "Genesis","Saturn","Dreamcast",
+  "PSP","PS Vita","Atari 2600"
+];
+const PLATFORMS = CURRENT_PLATFORMS.concat(RETRO_PLATFORMS);
+const STATUSES = ["Backlog","Playing","Completed","Dropped"];
+const PLATFORM_COLOR = {
+  // PlayStation family — blue, deepest for current flagship, lighter with age
+  "PS5":"#2E5FA3","PS4":"#3D6CB0","PS3":"#4C79BD","PS2":"#5B86CA","PS1":"#6A93D7",
+  "PSP":"#7AA0E4","PS Vita":"#89ADF1",
+  // Xbox family — green, deepest for current, lighter with age
+  "Xbox":"#3E8C4A","Xbox One":"#4B9756","Xbox 360":"#58A262","Xbox (Original)":"#2F7A3A",
+  // Nintendo family — crimson/red, deepest for current Switch, muted with age
+  "Switch":"#C1443A","Wii U":"#BC452D","Wii":"#B34834","GameCube":"#A94B3B",
+  "N64":"#9F4E42","SNES":"#955149","NES":"#8B5450",
+  "Game Boy Advance":"#C46A5C","Game Boy":"#C97A6E","DS":"#BF5A4A","3DS":"#D48A7E",
+  // PC — neutral grey, its own family
+  "PC":"#6C6C6C",
+  // Sega family — warm orange/amber
+  "Genesis":"#B85A2E","Saturn":"#C46A3A","Dreamcast":"#F58220",
+  // Atari — vintage brown
+  "Atari 2600":"#8B4A2E"
+};
+const PLATFORM_CODE = {
+  "PS5":"PS5","Switch":"SW","Xbox":"XB","PC":"PC",
+  "PS4":"PS4","PS3":"PS3","PS2":"PS2","PS1":"PS1",
+  "Xbox 360":"X360","Xbox One":"XB1","Xbox (Original)":"XBOG",
+  "GameCube":"GC","Wii U":"WIIU","Wii":"WII",
+  "N64":"N64","SNES":"SNES","NES":"NES",
+  "Game Boy Advance":"GBA","Game Boy":"GB","DS":"DS","3DS":"3DS",
+  "Genesis":"GEN","Saturn":"SAT","Dreamcast":"DC",
+  "PSP":"PSP","PS Vita":"VITA","Atari 2600":"AT26"
+};
+const STATUS_COLOR = {Backlog:"#4C5B73",Playing:"#C9862B",Completed:"#3F7D5C",Dropped:"#B23A3A"};
+const STORAGE_KEY = "backlog-catalog-games-v1";
+const SYNC_KEY = "backlog-catalog-sync-code-v1";
+
+// Built-in offline game database for the "known titles" search-as-you-type
+const GAME_DB = [
+  // PS5
+  {t:"Spider-Man 2",p:"PS5",y:2023},{t:"God of War Ragnarök",p:"PS5",y:2022},
+  {t:"Horizon Forbidden West",p:"PS5",y:2022},{t:"Ratchet & Clank: Rift Apart",p:"PS5",y:2021},
+  {t:"Demon's Souls",p:"PS5",y:2020},{t:"Returnal",p:"PS5",y:2021},
+  {t:"Ghost of Tsushima",p:"PS5",y:2020},{t:"The Last of Us Part I",p:"PS5",y:2022},
+  {t:"Gran Turismo 7",p:"PS5",y:2022},{t:"Final Fantasy XVI",p:"PS5",y:2023},
+  {t:"Resident Evil 4",p:"PS5",y:2023},{t:"Hogwarts Legacy",p:"PS5",y:2023},
+  {t:"Star Wars Jedi: Survivor",p:"PS5",y:2023},{t:"Alan Wake 2",p:"PS5",y:2023},
+  {t:"Helldivers 2",p:"PS5",y:2024},{t:"Silent Hill 2 (Remake)",p:"PS5",y:2024},
+  {t:"Marvel's Spider-Man: Miles Morales",p:"PS5",y:2020},{t:"Astro Bot",p:"PS5",y:2024},
+  {t:"Rise of the Ronin",p:"PS5",y:2024},{t:"Stellar Blade",p:"PS5",y:2024},
+  // Switch
+  {t:"The Legend of Zelda: Tears of the Kingdom",p:"Switch",y:2023},
+  {t:"The Legend of Zelda: Breath of the Wild",p:"Switch",y:2017},
+  {t:"Super Mario Odyssey",p:"Switch",y:2017},{t:"Animal Crossing: New Horizons",p:"Switch",y:2020},
+  {t:"Super Smash Bros. Ultimate",p:"Switch",y:2018},{t:"Splatoon 3",p:"Switch",y:2022},
+  {t:"Metroid Dread",p:"Switch",y:2021},{t:"Pokémon Scarlet",p:"Switch",y:2022},
+  {t:"Pokémon Violet",p:"Switch",y:2022},{t:"Fire Emblem Engage",p:"Switch",y:2023},
+  {t:"Xenoblade Chronicles 3",p:"Switch",y:2022},{t:"Mario Kart 8 Deluxe",p:"Switch",y:2017},
+  {t:"Kirby and the Forgotten Land",p:"Switch",y:2022},{t:"Bayonetta 3",p:"Switch",y:2022},
+  {t:"Pikmin 4",p:"Switch",y:2023},{t:"Super Mario Bros. Wonder",p:"Switch",y:2023},
+  {t:"The Legend of Zelda: Echoes of Wisdom",p:"Switch",y:2024},{t:"Luigi's Mansion 3",p:"Switch",y:2019},
+  {t:"Metroid Prime Remastered",p:"Switch",y:2023},{t:"Paper Mario: The Thousand-Year Door",p:"Switch",y:2024},
+  // Xbox (current)
+  {t:"Halo Infinite",p:"Xbox",y:2021},{t:"Forza Horizon 5",p:"Xbox",y:2021},
+  {t:"Starfield",p:"Xbox",y:2023},{t:"Gears 5",p:"Xbox",y:2019},
+  {t:"Sea of Thieves",p:"Xbox",y:2018},{t:"Hi-Fi Rush",p:"Xbox",y:2023},
+  {t:"Microsoft Flight Simulator",p:"Xbox",y:2020},{t:"Halo: The Master Chief Collection",p:"Xbox",y:2019},
+  {t:"Forza Motorsport",p:"Xbox",y:2023},{t:"Grounded",p:"Xbox",y:2022},
+  {t:"Psychonauts 2",p:"Xbox",y:2021},{t:"Ori and the Will of the Wisps",p:"Xbox",y:2020},
+  {t:"Avowed",p:"Xbox",y:2025},{t:"Indiana Jones and the Great Circle",p:"Xbox",y:2024},
+  // PC
+  {t:"Half-Life 2",p:"PC",y:2004},{t:"Portal 2",p:"PC",y:2011},
+  {t:"The Witcher 3: Wild Hunt",p:"PC",y:2015},{t:"Disco Elysium",p:"PC",y:2019},
+  {t:"Stardew Valley",p:"PC",y:2016},{t:"Hades",p:"PC",y:2020},
+  {t:"Factorio",p:"PC",y:2020},{t:"Cyberpunk 2077",p:"PC",y:2020},
+  {t:"Counter-Strike 2",p:"PC",y:2023},{t:"Dota 2",p:"PC",y:2013},
+  {t:"Baldur's Gate 3",p:"PC",y:2023},{t:"Divinity: Original Sin 2",p:"PC",y:2017},
+  {t:"Slay the Spire",p:"PC",y:2019},{t:"Celeste",p:"PC",y:2018},
+  {t:"Hollow Knight",p:"PC",y:2017},{t:"Deep Rock Galactic",p:"PC",y:2020},
+  {t:"Valheim",p:"PC",y:2021},{t:"Elden Ring",p:"PC",y:2022},
+  {t:"Diablo IV",p:"PC",y:2023},{t:"Balatro",p:"PC",y:2024},
+  {t:"Path of Exile 2",p:"PC",y:2024},{t:"Team Fortress 2",p:"PC",y:2007},
+  {t:"Minecraft",p:"PC",y:2011},{t:"Terraria",p:"PC",y:2011},
+  // PS4
+  {t:"The Last of Us Part II",p:"PS4",y:2020},{t:"Bloodborne",p:"PS4",y:2015},
+  {t:"Horizon Zero Dawn",p:"PS4",y:2017},{t:"Marvel's Spider-Man",p:"PS4",y:2018},
+  {t:"God of War",p:"PS4",y:2018},{t:"Persona 5",p:"PS4",y:2016},
+  {t:"Uncharted 4: A Thief's End",p:"PS4",y:2016},{t:"Death Stranding",p:"PS4",y:2019},
+  {t:"Days Gone",p:"PS4",y:2019},{t:"Detroit: Become Human",p:"PS4",y:2018},
+  {t:"Nier: Automata",p:"PS4",y:2017},{t:"Red Dead Redemption 2",p:"PS4",y:2018},
+  {t:"Dark Souls III",p:"PS4",y:2016},
+  // PS3
+  {t:"The Last of Us",p:"PS3",y:2013},{t:"Uncharted 2: Among Thieves",p:"PS3",y:2009},
+  {t:"Metal Gear Solid 4: Guns of the Patriots",p:"PS3",y:2008},{t:"Demon's Souls",p:"PS3",y:2009},
+  {t:"Journey",p:"PS3",y:2012},{t:"Red Dead Redemption",p:"PS3",y:2010},
+  {t:"Grand Theft Auto V",p:"PS3",y:2013},{t:"Dark Souls",p:"PS3",y:2011},
+  {t:"Heavy Rain",p:"PS3",y:2010},{t:"Ni no Kuni: Wrath of the White Witch",p:"PS3",y:2013},
+  // PS2
+  {t:"Shadow of the Colossus",p:"PS2",y:2005},{t:"God of War",p:"PS2",y:2005},
+  {t:"God of War II",p:"PS2",y:2007},{t:"Final Fantasy X",p:"PS2",y:2001},
+  {t:"Kingdom Hearts",p:"PS2",y:2002},{t:"Metal Gear Solid 3: Snake Eater",p:"PS2",y:2004},
+  {t:"Grand Theft Auto: San Andreas",p:"PS2",y:2004},{t:"Devil May Cry 3",p:"PS2",y:2005},
+  {t:"Persona 4",p:"PS2",y:2008},{t:"Silent Hill 2",p:"PS2",y:2001},
+  {t:"Katamari Damacy",p:"PS2",y:2004},{t:"Jak and Daxter: The Precursor Legacy",p:"PS2",y:2001},
+  // PS1
+  {t:"Final Fantasy VII",p:"PS1",y:1997},{t:"Metal Gear Solid",p:"PS1",y:1998},
+  {t:"Crash Bandicoot",p:"PS1",y:1996},{t:"Resident Evil",p:"PS1",y:1996},
+  {t:"Silent Hill",p:"PS1",y:1999},{t:"Castlevania: Symphony of the Night",p:"PS1",y:1997},
+  {t:"Spyro the Dragon",p:"PS1",y:1998},{t:"Tekken 3",p:"PS1",y:1997},
+  {t:"Gran Turismo",p:"PS1",y:1997},{t:"Tony Hawk's Pro Skater 2",p:"PS1",y:2000},
+  // Xbox 360
+  {t:"Red Dead Redemption",p:"Xbox 360",y:2010},{t:"Halo 3",p:"Xbox 360",y:2007},
+  {t:"Gears of War",p:"Xbox 360",y:2006},{t:"Mass Effect 2",p:"Xbox 360",y:2010},
+  {t:"Fable II",p:"Xbox 360",y:2008},{t:"Portal (The Orange Box)",p:"Xbox 360",y:2007},
+  {t:"BioShock",p:"Xbox 360",y:2007},{t:"Left 4 Dead 2",p:"Xbox 360",y:2009},
+  {t:"Call of Duty 4: Modern Warfare",p:"Xbox 360",y:2007},{t:"Forza Motorsport 4",p:"Xbox 360",y:2011},
+  // Xbox One
+  {t:"Halo 5: Guardians",p:"Xbox One",y:2015},{t:"Forza Horizon 3",p:"Xbox One",y:2016},
+  {t:"Sunset Overdrive",p:"Xbox One",y:2014},{t:"Titanfall 2",p:"Xbox One",y:2016},
+  {t:"Ori and the Blind Forest",p:"Xbox One",y:2015},{t:"Cuphead",p:"Xbox One",y:2017},
+  {t:"Gears of War 4",p:"Xbox One",y:2016},{t:"Quantum Break",p:"Xbox One",y:2016},
+  // Xbox (Original)
+  {t:"Halo: Combat Evolved",p:"Xbox (Original)",y:2001},{t:"Fable",p:"Xbox (Original)",y:2004},
+  {t:"Ninja Gaiden",p:"Xbox (Original)",y:2004},{t:"Star Wars: Knights of the Old Republic",p:"Xbox (Original)",y:2003},
+  {t:"Jade Empire",p:"Xbox (Original)",y:2005},{t:"Conker's Bad Fur Day",p:"Xbox (Original)",y:2000},
+  // GameCube
+  {t:"Resident Evil 4",p:"GameCube",y:2005},{t:"Super Smash Bros. Melee",p:"GameCube",y:2001},
+  {t:"Metroid Prime",p:"GameCube",y:2002},{t:"Super Mario Sunshine",p:"GameCube",y:2002},
+  {t:"Animal Crossing",p:"GameCube",y:2001},{t:"The Legend of Zelda: The Wind Waker",p:"GameCube",y:2002},
+  {t:"Paper Mario: The Thousand-Year Door",p:"GameCube",y:2004},{t:"Luigi's Mansion",p:"GameCube",y:2001},
+  {t:"Pikmin",p:"GameCube",y:2001},
+  // Wii U
+  {t:"Super Mario 3D World",p:"Wii U",y:2013},{t:"Mario Kart 8",p:"Wii U",y:2014},
+  {t:"Bayonetta 2",p:"Wii U",y:2014},{t:"Super Smash Bros. for Wii U",p:"Wii U",y:2014},
+  {t:"Pikmin 3",p:"Wii U",y:2013},{t:"Splatoon",p:"Wii U",y:2015},
+  // Wii
+  {t:"Super Mario Galaxy",p:"Wii",y:2007},{t:"The Legend of Zelda: Twilight Princess",p:"Wii",y:2006},
+  {t:"Wii Sports",p:"Wii",y:2006},{t:"Super Smash Bros. Brawl",p:"Wii",y:2008},
+  {t:"Metroid Prime 3: Corruption",p:"Wii",y:2007},{t:"Xenoblade Chronicles",p:"Wii",y:2010},
+  {t:"Donkey Kong Country Returns",p:"Wii",y:2010},
+  // N64
+  {t:"Ocarina of Time",p:"N64",y:1998},{t:"GoldenEye 007",p:"N64",y:1997},
+  {t:"Super Mario 64",p:"N64",y:1996},{t:"Banjo-Kazooie",p:"N64",y:1998},
+  {t:"Super Smash Bros.",p:"N64",y:1999},{t:"Paper Mario",p:"N64",y:2000},
+  {t:"Star Fox 64",p:"N64",y:1997},{t:"Perfect Dark",p:"N64",y:2000},
+  {t:"Majora's Mask",p:"N64",y:2000},
+  // SNES
+  {t:"Chrono Trigger",p:"SNES",y:1995},{t:"Super Metroid",p:"SNES",y:1994},
+  {t:"Super Mario World",p:"SNES",y:1990},{t:"Final Fantasy VI",p:"SNES",y:1994},
+  {t:"Street Fighter II",p:"SNES",y:1992},{t:"The Legend of Zelda: A Link to the Past",p:"SNES",y:1991},
+  {t:"Donkey Kong Country",p:"SNES",y:1994},{t:"Super Mario Kart",p:"SNES",y:1992},
+  {t:"EarthBound",p:"SNES",y:1994},
+  // NES
+  {t:"Super Mario Bros. 3",p:"NES",y:1988},{t:"The Legend of Zelda",p:"NES",y:1986},
+  {t:"Metroid",p:"NES",y:1986},{t:"Mega Man 2",p:"NES",y:1988},
+  {t:"Castlevania",p:"NES",y:1986},{t:"Punch-Out!!",p:"NES",y:1987},
+  {t:"Duck Hunt",p:"NES",y:1984},
+  // Game Boy
+  {t:"Pokémon Red",p:"Game Boy",y:1996},{t:"Pokémon Blue",p:"Game Boy",y:1996},
+  {t:"Tetris",p:"Game Boy",y:1989},{t:"The Legend of Zelda: Link's Awakening",p:"Game Boy",y:1993},
+  {t:"Super Mario Land",p:"Game Boy",y:1989},
+  // Game Boy Advance
+  {t:"Pokémon Emerald",p:"Game Boy Advance",y:2004},{t:"Metroid Fusion",p:"Game Boy Advance",y:2002},
+  {t:"The Legend of Zelda: The Minish Cap",p:"Game Boy Advance",y:2004},{t:"Golden Sun",p:"Game Boy Advance",y:2001},
+  {t:"Fire Emblem",p:"Game Boy Advance",y:2003},{t:"Advance Wars",p:"Game Boy Advance",y:2001},
+  {t:"Mario Kart: Super Circuit",p:"Game Boy Advance",y:2001},
+  // DS
+  {t:"Pokémon Platinum",p:"DS",y:2008},{t:"The Legend of Zelda: Phantom Hourglass",p:"DS",y:2007},
+  {t:"Mario Kart DS",p:"DS",y:2005},{t:"New Super Mario Bros.",p:"DS",y:2006},
+  {t:"Animal Crossing: Wild World",p:"DS",y:2005},{t:"Professor Layton and the Curious Village",p:"DS",y:2007},
+  // 3DS
+  {t:"Pokémon X",p:"3DS",y:2013},{t:"Animal Crossing: New Leaf",p:"3DS",y:2012},
+  {t:"Super Mario 3D Land",p:"3DS",y:2011},{t:"Fire Emblem Awakening",p:"3DS",y:2012},
+  {t:"Luigi's Mansion: Dark Moon",p:"3DS",y:2013},{t:"The Legend of Zelda: Ocarina of Time 3D",p:"3DS",y:2011},
+  // Genesis
+  {t:"Sonic the Hedgehog 2",p:"Genesis",y:1992},{t:"Sonic the Hedgehog",p:"Genesis",y:1991},
+  {t:"Streets of Rage 2",p:"Genesis",y:1992},{t:"Golden Axe",p:"Genesis",y:1989},
+  {t:"Gunstar Heroes",p:"Genesis",y:1993},{t:"ToeJam & Earl",p:"Genesis",y:1991},
+  // Saturn
+  {t:"Nights into Dreams",p:"Saturn",y:1996},{t:"Panzer Dragoon Saga",p:"Saturn",y:1998},
+  {t:"Guardian Heroes",p:"Saturn",y:1996},{t:"Virtua Fighter 2",p:"Saturn",y:1995},
+  // Dreamcast
+  {t:"Shenmue",p:"Dreamcast",y:1999},{t:"Jet Set Radio",p:"Dreamcast",y:2000},
+  {t:"Sonic Adventure",p:"Dreamcast",y:1998},{t:"Crazy Taxi",p:"Dreamcast",y:1999},
+  {t:"Skies of Arcadia",p:"Dreamcast",y:2000},
+  // PSP
+  {t:"God of War: Chains of Olympus",p:"PSP",y:2008},{t:"Grand Theft Auto: Liberty City Stories",p:"PSP",y:2005},
+  {t:"Patapon",p:"PSP",y:2007},{t:"Monster Hunter Freedom Unite",p:"PSP",y:2008},
+  {t:"Crisis Core: Final Fantasy VII",p:"PSP",y:2007},
+  // PS Vita
+  {t:"Persona 4 Golden",p:"PS Vita",y:2012},{t:"Gravity Rush",p:"PS Vita",y:2012},
+  {t:"Uncharted: Golden Abyss",p:"PS Vita",y:2011},{t:"Tearaway",p:"PS Vita",y:2013},
+  // Atari 2600
+  {t:"Pitfall!",p:"Atari 2600",y:1982},{t:"Adventure",p:"Atari 2600",y:1979},
+  {t:"Space Invaders",p:"Atari 2600",y:1980},{t:"Combat",p:"Atari 2600",y:1977},
+  {t:"Missile Command",p:"Atari 2600",y:1981},{t:"River Raid",p:"Atari 2600",y:1982},
+  {t:"Yars' Revenge",p:"Atari 2600",y:1982},{t:"Centipede",p:"Atari 2600",y:1982},
+
+  // More PS5
+  {t:"Baldur's Gate 3",p:"PS5",y:2023},{t:"Diablo IV",p:"PS5",y:2023},
+  {t:"EA Sports FC 25",p:"PS5",y:2024},{t:"Call of Duty: Black Ops 6",p:"PS5",y:2024},
+  {t:"Dragon's Dogma 2",p:"PS5",y:2024},{t:"Like a Dragon: Infinite Wealth",p:"PS5",y:2024},
+  {t:"Metaphor: ReFantazio",p:"PS5",y:2024},{t:"Black Myth: Wukong",p:"PS5",y:2024},
+  {t:"Until Dawn (Remake)",p:"PS5",y:2024},{t:"Death Stranding 2",p:"PS5",y:2025},
+  {t:"Assassin's Creed Shadows",p:"PS5",y:2025},{t:"Split Fiction",p:"PS5",y:2025},
+  // More Switch
+  {t:"Mario vs. Donkey Kong",p:"Switch",y:2024},{t:"Princess Peach: Showtime!",p:"Switch",y:2024},
+  {t:"Kirby's Return to Dream Land Deluxe",p:"Switch",y:2023},{t:"Fire Emblem Warriors: Three Hopes",p:"Switch",y:2022},
+  {t:"WarioWare: Move It!",p:"Switch",y:2023},{t:"Tears of the Kingdom",p:"Switch",y:2023},
+  {t:"Advance Wars 1+2: Re-Boot Camp",p:"Switch",y:2023},{t:"Triangle Strategy",p:"Switch",y:2022},
+  // More Xbox
+  {t:"Age of Empires IV",p:"Xbox",y:2021},{t:"South of Midnight",p:"Xbox",y:2025},
+  {t:"Diablo IV",p:"Xbox",y:2023},{t:"EA Sports FC 25",p:"Xbox",y:2024},
+  {t:"Call of Duty: Black Ops 6",p:"Xbox",y:2024},{t:"Senua's Saga: Hellblade II",p:"Xbox",y:2024},
+  // More PC
+  {t:"Rimworld",p:"PC",y:2018},{t:"Kerbal Space Program",p:"PC",y:2015},
+  {t:"Among Us",p:"PC",y:2018},{t:"Fall Guys",p:"PC",y:2020},
+  {t:"Rocket League",p:"PC",y:2015},{t:"Apex Legends",p:"PC",y:2019},
+  {t:"Overwatch 2",p:"PC",y:2022},{t:"Valorant",p:"PC",y:2020},
+  {t:"League of Legends",p:"PC",y:2009},{t:"World of Warcraft",p:"PC",y:2004},
+  {t:"Fallout: New Vegas",p:"PC",y:2010},{t:"Grand Theft Auto V",p:"PC",y:2015},
+  {t:"Sid Meier's Civilization VI",p:"PC",y:2016},{t:"Doom Eternal",p:"PC",y:2020},
+  {t:"Untitled Goose Game",p:"PC",y:2019},{t:"Vampire Survivors",p:"PC",y:2022},
+  {t:"Baldur's Gate",p:"PC",y:1998},{t:"Warcraft III",p:"PC",y:2002},
+  {t:"Age of Empires II",p:"PC",y:1999},{t:"Diablo II",p:"PC",y:2000},
+  // More PS4
+  {t:"Until Dawn",p:"PS4",y:2015},
+  {t:"Rise of the Tomb Raider",p:"PS4",y:2016},{t:"Marvel's Spider-Man: Miles Morales",p:"PS4",y:2020},
+  {t:"The Order: 1886",p:"PS4",y:2015},{t:"Infamous Second Son",p:"PS4",y:2014},
+  {t:"Ratchet & Clank",p:"PS4",y:2016},{t:"Yakuza 0",p:"PS4",y:2018},
+  {t:"Ghost of Tsushima",p:"PS4",y:2020},{t:"Judgment",p:"PS4",y:2019},
+  // More PS3
+  {t:"Uncharted 3: Drake's Deception",p:"PS3",y:2011},
+  {t:"Little Big Planet",p:"PS3",y:2008},{t:"Ico & Shadow of the Colossus Collection",p:"PS3",y:2011},
+  {t:"Yakuza 5",p:"PS3",y:2012},{t:"Valkyria Chronicles",p:"PS3",y:2008},
+  // More PS2
+  {t:"Ratchet & Clank",p:"PS2",y:2002},{t:"Jak II",p:"PS2",y:2003},
+  {t:"Devil May Cry",p:"PS2",y:2001},{t:"Okami",p:"PS2",y:2006},
+  {t:"Final Fantasy XII",p:"PS2",y:2006},{t:"Ico",p:"PS2",y:2001},
+  {t:"Tony Hawk's Pro Skater 3",p:"PS2",y:2001},{t:"Guitar Hero II",p:"PS2",y:2006},
+  // More PS1
+  {t:"Tomb Raider",p:"PS1",y:1996},{t:"Final Fantasy IX",p:"PS1",y:2000},
+  {t:"Twisted Metal",p:"PS1",y:1995},
+  {t:"Parasite Eve",p:"PS1",y:1998},{t:"Grand Theft Auto",p:"PS1",y:1997},
+  // More Xbox 360
+  {t:"Mass Effect",p:"Xbox 360",y:2007},{t:"Alan Wake",p:"Xbox 360",y:2010},
+  {t:"Dead Rising",p:"Xbox 360",y:2006},{t:"Batman: Arkham Asylum",p:"Xbox 360",y:2009},
+  {t:"Skyrim",p:"Xbox 360",y:2011},{t:"Braid",p:"Xbox 360",y:2008},
+  // More Xbox One
+  {t:"Rare Replay",p:"Xbox One",y:2015},{t:"Forza Horizon 4",p:"Xbox One",y:2018},
+  {t:"State of Decay 2",p:"Xbox One",y:2018},{t:"Recore",p:"Xbox One",y:2016},
+  // More GameCube
+  {t:"F-Zero GX",p:"GameCube",y:2003},{t:"Star Fox Assault",p:"GameCube",y:2005},
+  {t:"Fire Emblem: Path of Radiance",p:"GameCube",y:2005},{t:"Eternal Darkness: Sanity's Requiem",p:"GameCube",y:2002},
+  // More Wii
+  {t:"Kirby's Epic Yarn",p:"Wii",y:2010},{t:"Punch-Out!!",p:"Wii",y:2009},
+  {t:"The Legend of Zelda: Skyward Sword",p:"Wii",y:2011},{t:"Mario Party 8",p:"Wii",y:2007},
+  // More N64
+  {t:"Diddy Kong Racing",p:"N64",y:1997},{t:"Conker's Bad Fur Day",p:"N64",y:2001},
+  {t:"Mario Kart 64",p:"N64",y:1996},{t:"Donkey Kong 64",p:"N64",y:1999},
+  // More SNES
+  {t:"Super Castlevania IV",p:"SNES",y:1991},{t:"Mega Man X",p:"SNES",y:1993},
+  {t:"F-Zero",p:"SNES",y:1990},{t:"Kirby Super Star",p:"SNES",y:1996},
+  // More NES
+  {t:"Kirby's Adventure",p:"NES",y:1993},{t:"Contra",p:"NES",y:1988},
+  {t:"Final Fantasy",p:"NES",y:1987},{t:"Double Dragon",p:"NES",y:1988},
+  // More Genesis
+  {t:"Shining Force",p:"Genesis",y:1992},{t:"Phantasy Star IV",p:"Genesis",y:1994},
+  {t:"Comix Zone",p:"Genesis",y:1995},{t:"Ecco the Dolphin",p:"Genesis",y:1992},
+  // More handhelds
+  {t:"WarioWare, Inc.",p:"Game Boy Advance",y:2003},{t:"Kirby & the Amazing Mirror",p:"Game Boy Advance",y:2004},
+  {t:"Kirby: Canvas Curse",p:"DS",y:2005},{t:"Chrono Trigger",p:"DS",y:2008},
+  {t:"The Legend of Zelda: Majora's Mask 3D",p:"3DS",y:2015},{t:"Kid Icarus: Uprising",p:"3DS",y:2012},
+  {t:"Monster Hunter Generations",p:"3DS",y:2015},{t:"Pokémon Omega Ruby",p:"3DS",y:2014},
+
+  // Deeper Saturn, Dreamcast, PSP, Vita, Genesis, Wii U, Xbox Original coverage
+  {t:"Sega Rally Championship",p:"Saturn",y:1995},{t:"Burning Rangers",p:"Saturn",y:1998},
+  {t:"Dragon Force",p:"Saturn",y:1996},{t:"Radiant Silvergun",p:"Saturn",y:1998},
+  {t:"Powerstone",p:"Dreamcast",y:1999},{t:"Rez",p:"Dreamcast",y:2001},
+  {t:"Marvel vs. Capcom 2",p:"Dreamcast",y:2000},{t:"Grandia II",p:"Dreamcast",y:2000},
+  {t:"Daytona USA",p:"Dreamcast",y:1998},{t:"Space Channel 5",p:"Dreamcast",y:1999},
+  {t:"Lumines",p:"PSP",y:2004},{t:"Killzone: Liberation",p:"PSP",y:2006},
+  {t:"Daxter",p:"PSP",y:2006},{t:"Tactics Ogre: Let Us Cling Together",p:"PSP",y:2010},
+  {t:"Metal Gear Solid: Peace Walker",p:"PSP",y:2010},{t:"LocoRoco",p:"PSP",y:2006},
+  {t:"WipEout Pure",p:"PSP",y:2005},
+  {t:"Wipeout 2048",p:"PS Vita",y:2012},{t:"Killzone: Mercenary",p:"PS Vita",y:2013},
+  {t:"Soul Sacrifice",p:"PS Vita",y:2013},{t:"Freedom Wars",p:"PS Vita",y:2014},
+  {t:"Danganronpa: Trigger Happy Havoc",p:"PS Vita",y:2012},
+  {t:"Vectorman",p:"Genesis",y:1995},{t:"Ristar",p:"Genesis",y:1995},
+  {t:"Beyond Oasis",p:"Genesis",y:1994},{t:"Sonic 3 & Knuckles",p:"Genesis",y:1994},
+  {t:"Rayman Legends",p:"Wii U",y:2013},{t:"Hyrule Warriors",p:"Wii U",y:2014},
+  {t:"Kirby and the Rainbow Curse",p:"Wii U",y:2015},{t:"The Wonderful 101",p:"Wii U",y:2013},
+  {t:"Xenoblade Chronicles X",p:"Wii U",y:2015},
+  {t:"Blinx: The Time Sweeper",p:"Xbox (Original)",y:2002},{t:"Otogi: Myth of Demons",p:"Xbox (Original)",y:2002},
+  {t:"Panzer Dragoon Orta",p:"Xbox (Original)",y:2002},{t:"Voodoo Vince",p:"Xbox (Original)",y:2003},
+
+  // Deeper PS1 / PS2 / N64 / SNES / NES coverage
+  {t:"Chrono Cross",p:"PS1",y:1999},{t:"Vagrant Story",p:"PS1",y:2000},
+  {t:"Xenogears",p:"PS1",y:1998},{t:"Suikoden II",p:"PS1",y:1998},
+  {t:"Ape Escape",p:"PS1",y:1999},{t:"Crash Team Racing",p:"PS1",y:1999},
+  {t:"Devil May Cry 2",p:"PS2",y:2003},{t:"Dark Cloud",p:"PS2",y:2000},
+  {t:"Kingdom Hearts II",p:"PS2",y:2005},{t:"Final Fantasy X-2",p:"PS2",y:2003},
+  {t:"Rogue Galaxy",p:"PS2",y:2005},{t:"Odin Sphere",p:"PS2",y:2007},
+  {t:"Killer7",p:"PS2",y:2005},{t:"We Love Katamari",p:"PS2",y:2005},
+  {t:"1080° Snowboarding",p:"N64",y:1998},{t:"Blast Corps",p:"N64",y:1997},
+  {t:"Jet Force Gemini",p:"N64",y:1999},{t:"Kirby 64: The Crystal Shards",p:"N64",y:2000},
+  {t:"Yoshi's Story",p:"N64",y:1998},{t:"Wave Race 64",p:"N64",y:1996},
+  {t:"Secret of Mana",p:"SNES",y:1993},{t:"Super Punch-Out!!",p:"SNES",y:1994},
+  {t:"Kirby's Dream Land 3",p:"SNES",y:1997},{t:"Star Fox",p:"SNES",y:1993},
+  {t:"Yoshi's Island",p:"SNES",y:1995},{t:"Terranigma",p:"SNES",y:1995},
+  {t:"Ninja Gaiden",p:"NES",y:1988},{t:"Mega Man 3",p:"NES",y:1990},
+  {t:"River City Ransom",p:"NES",y:1989},{t:"Ducktales",p:"NES",y:1989},
+  {t:"Excitebike",p:"NES",y:1984},{t:"Ice Climber",p:"NES",y:1985},
+
+  // ===== Subscription "classics" catalogs: Nintendo Switch Online, PS Plus Premium, Xbox back-compat =====
+  // NSO — NES app extras
+  {t:"Balloon Fight",p:"NES",y:1985},{t:"Donkey Kong 3",p:"NES",y:1983},
+  {t:"Donkey Kong Jr.",p:"NES",y:1982},{t:"Kid Icarus",p:"NES",y:1986},
+  {t:"Star Soldier",p:"NES",y:1986},{t:"Mario Bros.",p:"NES",y:1983},
+  // NSO — SNES app extras
+  {t:"Demon's Crest",p:"SNES",y:1994},{t:"Pop'n TwinBee",p:"SNES",y:1993},
+  {t:"Kirby's Dream Course",p:"SNES",y:1994},{t:"Breath of Fire II",p:"SNES",y:1994},
+  {t:"The Legend of the Mystical Ninja",p:"SNES",y:1992},{t:"Stunt Race FX",p:"SNES",y:1994},
+  {t:"Super Ghouls 'n Ghosts",p:"SNES",y:1991},{t:"Super Soccer",p:"SNES",y:1991},
+  {t:"Pilotwings",p:"SNES",y:1991},
+  // NSO Expansion Pack — N64 app extras
+  {t:"Mario Party",p:"N64",y:1998},{t:"Mario Party 2",p:"N64",y:1999},
+  {t:"Mario Party 3",p:"N64",y:2000},{t:"Pokémon Stadium",p:"N64",y:2000},
+  {t:"Pokémon Stadium 2",p:"N64",y:2001},{t:"Pilotwings 64",p:"N64",y:1996},
+  {t:"Excitebike 64",p:"N64",y:2000},{t:"Sin and Punishment",p:"N64",y:2000},
+  {t:"F-Zero X",p:"N64",y:1998},{t:"WinBack: Covert Operations",p:"N64",y:1999},
+  // NSO Expansion Pack — Genesis app extras
+  {t:"Castlevania: Bloodlines",p:"Genesis",y:1994},{t:"Earthworm Jim",p:"Genesis",y:1994},
+  {t:"Dr. Robotnik's Mean Bean Machine",p:"Genesis",y:1993},{t:"Alex Kidd in the Enchanted Castle",p:"Genesis",y:1989},
+  {t:"Space Harrier II",p:"Genesis",y:1988},
+  // NSO Expansion Pack — GBA app extras
+  {t:"Mario vs. Donkey Kong",p:"Game Boy Advance",y:2004},{t:"Mr. Driller 2",p:"Game Boy Advance",y:2002},
+  {t:"Super Mario Advance 4: Super Mario Bros. 3",p:"Game Boy Advance",y:2003},{t:"Dr. Mario & Puzzle League",p:"Game Boy Advance",y:2005},
+  // NSO — GameCube app extras (Switch 2 exclusive)
+  {t:"Chibi-Robo!",p:"GameCube",y:2005},
+  // PS Plus Premium Classics — PS1
+  {t:"Twisted Metal 2",p:"PS1",y:1996},{t:"Harvest Moon: Back to Nature",p:"PS1",y:1999},
+  {t:"Legend of Mana",p:"PS1",y:1999},{t:"Star Wars: Episode I – The Phantom Menace",p:"PS1",y:1999},
+  {t:"Worms Armageddon",p:"PS1",y:1999},{t:"Riven",p:"PS1",y:1997},
+  {t:"Myst",p:"PS1",y:1995},{t:"Toy Story 2: Buzz Lightyear to the Rescue",p:"PS1",y:1999},
+  {t:"Disney's Atlantis: The Lost Empire",p:"PS1",y:2001},{t:"Syphon Filter",p:"PS1",y:1999},
+  {t:"The Legend of Dragoon",p:"PS1",y:1999},{t:"Hot Shots Golf",p:"PS1",y:1998},
+  {t:"Jet Moto",p:"PS1",y:1996},{t:"I.Q. Intelligent Qube",p:"PS1",y:1997},
+  {t:"Mr. Driller",p:"PS1",y:1999},{t:"Jumping Flash!",p:"PS1",y:1995},
+  // PS Plus Premium Classics — PS2
+  {t:"Wild Arms 3",p:"PS2",y:2002},{t:"Onimusha: Dawn of Dreams",p:"PS2",y:2006},
+  {t:"Deus Ex: The Conspiracy",p:"PS2",y:2000},
+  // PS Plus Premium Classics — PS3
+  {t:"Mega Man 9",p:"PS3",y:2008},{t:"Dynasty Warriors 8",p:"PS3",y:2013},
+  {t:"Fallout: New Vegas",p:"PS3",y:2010},{t:"Skullgirls",p:"PS3",y:2012},
+  // PS Plus Premium Classics — PSP / Vita
+  {t:"Kingdom of Paradise",p:"PSP",y:2006},{t:"Pursuit Force",p:"PSP",y:2005},
+  {t:"Ape Escape Academy",p:"PSP",y:2006},{t:"Toukiden: Kiwami",p:"PS Vita",y:2015},
+  // Xbox Game Pass back-compat favorites
+  {t:"Halo 2",p:"Xbox (Original)",y:2004},{t:"Crackdown",p:"Xbox 360",y:2007},
+  {t:"Perfect Dark Zero",p:"Xbox 360",y:2005},{t:"Banjo-Kazooie: Nuts & Bolts",p:"Xbox 360",y:2008},
+
+  // ===== Full franchise coverage: Ratchet & Clank, Spyro, Crysis, Pokémon, Sly Cooper, Ape Escape, Kingdom Hearts =====
+  {t:"Ratchet & Clank: Going Commando",p:"PS2",y:2003},{t:"Ratchet & Clank: Up Your Arsenal",p:"PS2",y:2004},
+  {t:"Ratchet: Deadlocked",p:"PS2",y:2005},{t:"Ratchet & Clank: Size Matters",p:"PSP",y:2007},
+  {t:"Secret Agent Clank",p:"PSP",y:2008},{t:"Ratchet & Clank Future: A Crack in Time",p:"PS3",y:2009},
+  {t:"Ratchet & Clank: All 4 One",p:"PS3",y:2011},{t:"Ratchet & Clank: Into the Nexus",p:"PS3",y:2013},
+
+  {t:"Spyro 2: Ripto's Rage!",p:"PS1",y:1999},{t:"Spyro: Year of the Dragon",p:"PS1",y:2000},
+  {t:"Spyro: Enter the Dragonfly",p:"PS2",y:2002},{t:"Spyro: A Hero's Tail",p:"PS2",y:2004},
+  {t:"The Legend of Spyro: A New Beginning",p:"PS2",y:2006},{t:"Spyro Reignited Trilogy",p:"PS4",y:2018},
+
+  {t:"Crysis",p:"PC",y:2007},{t:"Crysis Warhead",p:"PC",y:2008},
+  {t:"Crysis 2",p:"PC",y:2011},{t:"Crysis 3",p:"PC",y:2013},
+  {t:"Crysis Remastered",p:"PS4",y:2020},
+
+  {t:"Pokémon Yellow",p:"Game Boy",y:1998},{t:"Pokémon Gold",p:"Game Boy",y:1999},
+  {t:"Pokémon Silver",p:"Game Boy",y:1999},{t:"Pokémon Ruby",p:"Game Boy Advance",y:2002},
+  {t:"Pokémon Sapphire",p:"Game Boy Advance",y:2002},{t:"Pokémon FireRed",p:"Game Boy Advance",y:2004},
+  {t:"Pokémon Diamond",p:"DS",y:2006},{t:"Pokémon Pearl",p:"DS",y:2006},
+  {t:"Pokémon HeartGold",p:"DS",y:2009},{t:"Pokémon SoulSilver",p:"DS",y:2009},
+  {t:"Pokémon Black",p:"DS",y:2010},{t:"Pokémon White",p:"DS",y:2010},
+  {t:"Pokémon Y",p:"3DS",y:2013},{t:"Pokémon Sun",p:"3DS",y:2016},
+  {t:"Pokémon Moon",p:"3DS",y:2016},{t:"Pokémon Let's Go, Pikachu!",p:"Switch",y:2018},
+  {t:"Pokémon Sword",p:"Switch",y:2019},{t:"Pokémon Shield",p:"Switch",y:2019},
+  {t:"Pokémon Legends: Arceus",p:"Switch",y:2022},{t:"Pokémon Brilliant Diamond",p:"Switch",y:2021},
+
+  {t:"Sly Cooper and the Thievius Raccoonus",p:"PS2",y:2002},{t:"Sly 2: Band of Thieves",p:"PS2",y:2004},
+  {t:"Sly 3: Honor Among Thieves",p:"PS2",y:2005},{t:"Sly Cooper: Thieves in Time",p:"PS3",y:2013},
+
+  {t:"Ape Escape 2",p:"PS2",y:2003},{t:"Ape Escape 3",p:"PS2",y:2005},
+  {t:"Ape Escape: On the Loose",p:"PSP",y:2005},{t:"Ape Escape: Pumped & Primed",p:"PS2",y:2005},
+
+  {t:"Kingdom Hearts: Chain of Memories",p:"Game Boy Advance",y:2004},{t:"Kingdom Hearts 358/2 Days",p:"DS",y:2009},
+  {t:"Kingdom Hearts: Birth by Sleep",p:"PSP",y:2010},{t:"Kingdom Hearts Re:coded",p:"DS",y:2011},
+  {t:"Kingdom Hearts 3D: Dream Drop Distance",p:"3DS",y:2012},
+
+  // ===== Major expansion pass =====
+  // PS5
+  {t:"It Takes Two",p:"PS5",y:2021},{t:"Kena: Bridge of Spirits",p:"PS5",y:2021},
+  {t:"Sifu",p:"PS5",y:2022},{t:"Tekken 8",p:"PS5",y:2024},
+  {t:"Street Fighter 6",p:"PS5",y:2023},{t:"Granblue Fantasy Relink",p:"PS5",y:2024},
+  {t:"Persona 3 Reload",p:"PS5",y:2024},{t:"Final Fantasy VII Rebirth",p:"PS5",y:2024},
+  {t:"Lies of P",p:"PS5",y:2023},{t:"Armored Core VI",p:"PS5",y:2023},
+  {t:"Forspoken",p:"PS5",y:2023},{t:"A Plague Tale: Requiem",p:"PS5",y:2022},
+  {t:"Sackboy: A Big Adventure",p:"PS5",y:2020},
+  {t:"Deathloop",p:"PS5",y:2021},{t:"Ratchet & Clank",p:"PS5",y:2016},
+  {t:"Sonic Frontiers",p:"PS5",y:2022},{t:"Immortals of Aveum",p:"PS5",y:2023},
+  {t:"Concord",p:"PS5",y:2024},
+  // Switch
+  {t:"Xenoblade Chronicles 2",p:"Switch",y:2017},{t:"Fire Emblem: Three Houses",p:"Switch",y:2019},
+  {t:"Octopath Traveler",p:"Switch",y:2018},{t:"Shin Megami Tensei V",p:"Switch",y:2021},
+  {t:"Astral Chain",p:"Switch",y:2019},{t:"Ring Fit Adventure",p:"Switch",y:2019},
+  {t:"Mario + Rabbids Kingdom Battle",p:"Switch",y:2017},{t:"Yoshi's Crafted World",p:"Switch",y:2019},
+  {t:"Captain Toad: Treasure Tracker",p:"Switch",y:2018},{t:"Overcooked 2",p:"Switch",y:2018},
+  {t:"Monster Hunter Rise",p:"Switch",y:2021},{t:"Persona 5 Royal",p:"Switch",y:2022},
+  {t:"Untitled Goose Game",p:"Switch",y:2019},{t:"Celeste",p:"Switch",y:2018},
+  {t:"Stardew Valley",p:"Switch",y:2017},{t:"Hollow Knight",p:"Switch",y:2018},
+  {t:"Hades",p:"Switch",y:2020},{t:"Disco Elysium",p:"Switch",y:2021},
+  {t:"Diablo III: Eternal Collection",p:"Switch",y:2018},{t:"Dragon Quest XI S",p:"Switch",y:2019},
+  {t:"Pikmin 1+2",p:"Switch",y:2023},{t:"Detective Pikachu Returns",p:"Switch",y:2023},
+  // Xbox
+  {t:"As Dusk Falls",p:"Xbox",y:2022},{t:"Pentiment",p:"Xbox",y:2022},
+  {t:"Age of Mythology: Retold",p:"Xbox",y:2024},
+  {t:"Everwild",p:"Xbox",y:2025},{t:"Baldur's Gate 3",p:"Xbox",y:2023},
+  {t:"Redfall",p:"Xbox",y:2023},
+  {t:"Palworld",p:"Xbox",y:2024},{t:"Lies of P",p:"Xbox",y:2023},
+  {t:"NBA 2K25",p:"Xbox",y:2024},
+  // PC
+  {t:"Half-Life",p:"PC",y:1998},{t:"Doom",p:"PC",y:1993},
+  {t:"Quake",p:"PC",y:1996},{t:"StarCraft",p:"PC",y:1998},
+  {t:"The Sims",p:"PC",y:2000},{t:"SimCity 2000",p:"PC",y:1993},
+  {t:"Myst",p:"PC",y:1993},{t:"Deus Ex",p:"PC",y:2000},
+  {t:"System Shock 2",p:"PC",y:1999},{t:"Fallout",p:"PC",y:1997},
+  {t:"Fallout 2",p:"PC",y:1998},{t:"Neverwinter Nights",p:"PC",y:2002},
+  {t:"Total War: Shogun 2",p:"PC",y:2011},{t:"Crusader Kings III",p:"PC",y:2020},
+  {t:"Europa Universalis IV",p:"PC",y:2013},{t:"Command & Conquer: Red Alert",p:"PC",y:1996},
+  {t:"Homeworld",p:"PC",y:1999},{t:"XCOM: Enemy Unknown",p:"PC",y:2012},
+  {t:"Divinity: Original Sin",p:"PC",y:2014},{t:"Pillars of Eternity",p:"PC",y:2015},
+  {t:"Return of the Obra Dinn",p:"PC",y:2018},{t:"Outer Wilds",p:"PC",y:2019},
+  {t:"Kentucky Route Zero",p:"PC",y:2013},{t:"Papers, Please",p:"PC",y:2013},
+  {t:"FTL: Faster Than Light",p:"PC",y:2012},{t:"Darkest Dungeon",p:"PC",y:2016},
+  {t:"Rust",p:"PC",y:2018},{t:"ARK: Survival Evolved",p:"PC",y:2017},
+  {t:"Sea of Thieves",p:"PC",y:2018},{t:"PUBG: Battlegrounds",p:"PC",y:2017},
+  {t:"Left 4 Dead 2",p:"PC",y:2009},{t:"Garry's Mod",p:"PC",y:2006},
+  // PS4
+  {t:"NieR: Automata",p:"PS4",y:2017},
+  {t:"Monster Hunter: World",p:"PS4",y:2018},{t:"Yakuza: Like a Dragon",p:"PS4",y:2020},
+  {t:"Kingdom Hearts III",p:"PS4",y:2019},{t:"Final Fantasy VII Remake",p:"PS4",y:2020},
+  {t:"Sekiro: Shadows Die Twice",p:"PS4",y:2019},
+  {t:"The Witcher 3: Wild Hunt",p:"PS4",y:2015},
+  {t:"Injustice 2",p:"PS4",y:2017},{t:"Street Fighter V",p:"PS4",y:2016},
+  {t:"Tekken 7",p:"PS4",y:2017},{t:"Middle-earth: Shadow of Mordor",p:"PS4",y:2014},
+  {t:"Metal Gear Solid V: The Phantom Pain",p:"PS4",y:2015},{t:"Watch Dogs 2",p:"PS4",y:2016},
+  {t:"Horizon Zero Dawn: Complete Edition",p:"PS4",y:2018},{t:"Firewatch",p:"PS4",y:2016},
+  {t:"What Remains of Edith Finch",p:"PS4",y:2017},{t:"Inside",p:"PS4",y:2016},
+  // PS3
+  {t:"inFamous",p:"PS3",y:2009},
+  {t:"Ratchet & Clank Future: Tools of Destruction",p:"PS3",y:2007},{t:"God of War III",p:"PS3",y:2010},
+  {t:"Killzone 2",p:"PS3",y:2009},{t:"Resistance: Fall of Man",p:"PS3",y:2006},
+  {t:"Catherine",p:"PS3",y:2011},
+  {t:"Dragon's Dogma",p:"PS3",y:2012},{t:"Persona 5 (Original)",p:"PS3",y:2016},
+  {t:"Ni no Kuni II",p:"PS3",y:2011},{t:"Tales of Vesperia",p:"PS3",y:2009},
+  // PS2
+  {t:"Gran Turismo 3: A-Spec",p:"PS2",y:2001},{t:"Metal Gear Solid 2: Sons of Liberty",p:"PS2",y:2001},
+  {t:"Onimusha: Warlords",p:"PS2",y:2001},
+  {t:"Suikoden III",p:"PS2",y:2002},{t:"Guitar Hero III",p:"PS2",y:2007},
+  {t:"Burnout 3: Takedown",p:"PS2",y:2004},{t:"SSX Tricky",p:"PS2",y:2001},
+  {t:"Dragon Quest VIII",p:"PS2",y:2004},{t:"Final Fantasy XI",p:"PS2",y:2002},
+  // PS1
+  {t:"Legend of Legaia",p:"PS1",y:1998},{t:"Wild Arms",p:"PS1",y:1996},
+  {t:"Tomba!",p:"PS1",y:1997},{t:"Oddworld: Abe's Oddysee",p:"PS1",y:1997},
+  {t:"Colony Wars",p:"PS1",y:1997},{t:"Rayman",p:"PS1",y:1995},
+  {t:"WipEout",p:"PS1",y:1995},{t:"Tekken 2",p:"PS1",y:1996},
+  // Xbox 360
+  {t:"Fallout 3",p:"Xbox 360",y:2008},{t:"Dragon Age: Origins",p:"Xbox 360",y:2009},
+  {t:"Assassin's Creed II",p:"Xbox 360",y:2009},{t:"Halo: Reach",p:"Xbox 360",y:2010},
+  {t:"Fable III",p:"Xbox 360",y:2010},{t:"Viva Piñata",p:"Xbox 360",y:2006},
+  {t:"Limbo",p:"Xbox 360",y:2010},{t:"Castle Crashers",p:"Xbox 360",y:2008},
+  // Xbox One
+  {t:"Gears of War: Ultimate Edition",p:"Xbox One",y:2015},
+  {t:"Killer Instinct",p:"Xbox One",y:2013},
+  // GameCube
+  {t:"Tales of Symphonia",p:"GameCube",y:2003},{t:"Baten Kaitos",p:"GameCube",y:2003},
+  {t:"Viewtiful Joe",p:"GameCube",y:2003},{t:"Skies of Arcadia Legends",p:"GameCube",y:2003},
+  {t:"WWE Day of Reckoning",p:"GameCube",y:2004},{t:"Mario Party 4",p:"GameCube",y:2002},
+  // N64
+  {t:"Rampage World Tour",p:"N64",y:1997},{t:"Killer Instinct Gold",p:"N64",y:1996},
+  {t:"Body Harvest",p:"N64",y:1998},{t:"Beetle Adventure Racing",p:"N64",y:1999},
+  // SNES
+  {t:"Super Mario RPG",p:"SNES",y:1996},{t:"Illusion of Gaia",p:"SNES",y:1994},
+  {t:"Contra III: The Alien Wars",p:"SNES",y:1992},{t:"Actraiser",p:"SNES",y:1990},
+  // NES
+  {t:"Dr. Mario",p:"NES",y:1990},{t:"Bubble Bobble",p:"NES",y:1986},
+  {t:"Gyromite",p:"NES",y:1985},{t:"StarTropics",p:"NES",y:1990},
+];
+
+let games = [];
+let statusFilter = "All";
+let platformFilter = "All";
+let searchTerm = "";
+let editingId = null;
+
+// ---------- storage ----------
+function loadGames(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    games = raw ? JSON.parse(raw) : [];
+  }catch(e){
+    games = [];
+    showError("Couldn't read saved data — starting fresh.");
+  }
+}
+function saveGames(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(games));
+    hideError();
+  }catch(e){
+    showError("Couldn't save — your changes may not persist.");
+  }
+  pushToFirebase();
+}
+function showError(msg){
+  const el = document.getElementById("errorMsg");
+  el.textContent = msg; el.classList.remove("hidden");
+}
+function hideError(){ document.getElementById("errorMsg").classList.add("hidden"); }
+
+// ---------- helpers ----------
+function uid(){ return Math.random().toString(36).slice(2,10); }
+function callNumber(platform, index){
+  const prefix = PLATFORM_CODE[platform] || "GM";
+  return prefix + "-" + String(index+1).padStart(3,"0");
+}
+function esc(s){
+  return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+// ---------- cover thumbnail lookup (Wikipedia, free & key-less) ----------
+const THUMB_CACHE_KEY = "backlog-thumb-cache-v25";
+let thumbCache = {};
+function loadThumbCache(){
+  try{ thumbCache = JSON.parse(localStorage.getItem(THUMB_CACHE_KEY) || "{}"); }
+  catch(e){ thumbCache = {}; }
+}
+function saveThumbCache(){
+  try{ localStorage.setItem(THUMB_CACHE_KEY, JSON.stringify(thumbCache)); }catch(e){}
+}
+let jsonpCounter = 0;
+function wikiJSONP(url){
+  return new Promise((resolve) => {
+    const cbName = "wikiCb_" + (jsonpCounter++) + "_" + Math.random().toString(36).slice(2);
+    let done = false;
+    const script = document.createElement("script");
+    function cleanup(){
+      delete window[cbName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+    }
+    window[cbName] = (data) => {
+      if (done) return;
+      done = true;
+      cleanup();
+      resolve(data);
+    };
+    script.src = url + "&callback=" + cbName;
+    script.onerror = () => { if (!done){ done = true; cleanup(); resolve(null); } };
+    document.body.appendChild(script);
+    setTimeout(() => { if (!done){ done = true; cleanup(); resolve(null); } }, 8000);
+  });
+}
+// a file title counts as "cover art" if it looks like a box art / cover / logo image, not a screenshot or unrelated art
+const COVER_ART_PATTERN = /cover|box[\s_-]?art|boxart/i;
+// exclude files that are clearly about the hardware/platform itself, not the specific game —
+// these can slip through the title-word check for short-titled games (e.g. "GTA V", "Doom")
+const PLATFORM_LOGO_EXCLUDE = /playstation|xbox|nintendo[\s_-]?switch|\bwii|wii[\s_-]?u|gamecube|\bps[1-5]|\bpsp|\bvita|game[\s_-]?boy|\bnes|\bsnes|\bn64|\b3ds|sega|genesis|dreamcast|saturn|atari|controller|console[\s_-]?logo/i;
+// a PAGE whose title is essentially just a console/platform name (e.g. Wikipedia's own
+// "PlayStation 5" or "Xbox Series X" articles) should never be treated as "the game" —
+// this can happen when search matches the wrong page entirely
+const PLATFORM_PAGE_PATTERN = /^(sony |microsoft |nintendo )?(playstation([\s_-]?\d| portable| vita)?|xbox([\s_-]?(one|360|series[\s_-]?x([\s_-]?and[\s_-]?series[\s_-]?s)?))?|nintendo[\s_-]?switch([\s_-]?2)?|wii([\s_-]?u)?|gamecube|nintendo[\s_-]?(entertainment[\s_-]?system|64|ds|3ds)|super[\s_-]?nintendo[\s_-]?entertainment[\s_-]?system|game[\s_-]?boy([\s_-]?(advance|color))?|sega[\s_-]?(genesis|saturn|dreamcast|mega[\s_-]?drive)|atari([\s_-]?2600)?)$/i;
+// pages about the developer/publisher itself — these can share a game's own name
+// (e.g. "Halo Studios" making Halo games) and pass a simple word-overlap check
+// without actually being the game's own page
+const STUDIO_PAGE_PATTERN = /\b(studios?|software|interactive|entertainment|games|productions|publishing)\s*$/i;
+function titleWords(title){
+  return title.toLowerCase().split(/[^a-z0-9]+/).filter(w => w.length >= 4);
+}
+function cacheKeyFor(title, year){
+  const base = (title || "").trim().toLowerCase();
+  return year ? base + "|" + year : base;
+}
+async function wikiSearchThumbJSONP(title, year, platform){
+  const searchTerm = title + " video game" + (platform ? " " + platform : "") + (year ? " " + year : "");
+  const searchUrl = "https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch="
+    + encodeURIComponent(searchTerm) + "&gsrlimit=5&prop=pageimages|images&pithumbsize=300&imlimit=50&format=json";
+  const data = await wikiJSONP(searchUrl);
+  if (!data) return null;
+  let fallbackThumb = null;
+  let coverFileTitle = null;
+  const words = titleWords(title);
+  function isTrustworthyThumb(page){
+    if (!page.thumbnail || !page.thumbnail.source) return false;
+    const fileName = page.pageimage || page.thumbnail.source;
+    return !PLATFORM_LOGO_EXCLUDE.test(fileName); // reject generic platform/hardware brand images
+  }
+  try{
+    const pages = data.query && data.query.pages;
+    if (pages){
+      // results come back unordered; sort by search rank. Pages that are themselves just
+      // "PlayStation 5"-style platform articles are dropped first, since they can never be
+      // the right match for a specific game. Then — critically — ANY page (including the
+      // very top search result) is only trusted if its own title actually references this
+      // game; a page that merely turns up in results without sharing a real word (e.g. a
+      // "PS5 games of 2021" roundup, or a general "console generations" article) is never
+      // trusted for an image, no matter how highly it ranked.
+      const ranked = Object.values(pages)
+        .filter(p => !PLATFORM_PAGE_PATTERN.test((p.title || "").trim()) && !STUDIO_PAGE_PATTERN.test((p.title || "").trim()))
+        .sort((a, b) => (a.index || 0) - (b.index || 0));
+      const relevantPages = words.length === 0
+        ? ranked // title too short/generic to filter further
+        : ranked.filter(p => words.some(w => (p.title || "").toLowerCase().includes(w)));
+      const topPage = relevantPages[0];
+      if (topPage){
+        if (isTrustworthyThumb(topPage)){
+          fallbackThumb = topPage.thumbnail.source;
+        }
+        if (Array.isArray(topPage.images)){
+          const candidates = topPage.images.filter(img => {
+            if (!COVER_ART_PATTERN.test(img.title)) return false;
+            if (PLATFORM_LOGO_EXCLUDE.test(img.title)) return false; // never trust a hardware/platform logo as "cover art"
+            // require the filename to actually reference this game's own title,
+            // so a platform/company logo mentioned on the same page doesn't get picked instead
+            if (words.length === 0) return true; // title too short/generic to filter further
+            const lower = img.title.toLowerCase();
+            return words.some(w => lower.includes(w));
+          });
+          if (candidates.length === 1){
+            coverFileTitle = candidates[0].title;
+          } else if (candidates.length > 1){
+            // multiple plausible files (e.g. several editions' covers, spin-off logos) —
+            // only trust the one Wikipedia itself already uses as this page's main image;
+            // otherwise it's genuinely ambiguous, so fall back to the generic thumbnail below
+            // rather than guessing which cover is the "right" one
+            const canonicalName = (topPage.pageimage || "").toLowerCase();
+            const matched = candidates.find(c => c.title.replace(/^File:/i, "").toLowerCase() === canonicalName);
+            if (matched) coverFileTitle = matched.title;
+          }
+        }
+      }
+      // if the top relevant page had no trustworthy thumbnail (no image at all, or only a
+      // generic platform/hardware logo), fall back to the next relevant page that has one
+      if (!fallbackThumb){
+        for (const page of relevantPages){
+          if (isTrustworthyThumb(page)){
+            fallbackThumb = page.thumbnail.source;
+            break;
+          }
+        }
+      }
+    }
+  }catch(e){}
+
+  if (coverFileTitle){
+    // resolve the specific cover-art file to its real image URL
+    try{
+      await new Promise(r => setTimeout(r, 350)); // avoid firing two requests back-to-back for one lookup
+      const infoUrl = "https://en.wikipedia.org/w/api.php?action=query&titles="
+        + encodeURIComponent(coverFileTitle) + "&prop=imageinfo&iiprop=url&iiurlwidth=300&format=json";
+      const infoData = await wikiJSONP(infoUrl);
+      const infoPages = infoData && infoData.query && infoData.query.pages;
+      if (infoPages){
+        const page = Object.values(infoPages)[0];
+        const info = page && page.imageinfo && page.imageinfo[0];
+        const url = (info && (info.thumburl || info.url)) || null;
+        if (url) return url;
+      }
+    }catch(e){ /* fall through to generic thumbnail below */ }
+  }
+  return fallbackThumb;
+}
+// libretro's thumbnail archive (static files, built for RetroArch) — retro platforms only,
+// requires an exact filename match to their game-naming convention, so this is a
+// best-effort first attempt, not a replacement for the Wikipedia fallback below
+const LIBRETRO_SYSTEM_MAP = {
+  "PS1": "Sony - PlayStation",
+  "PS2": "Sony - PlayStation 2",
+  "PS3": "Sony - PlayStation 3",
+  "PSP": "Sony - PlayStation Portable",
+  "PS Vita": "Sony - PlayStation Vita",
+  "Xbox (Original)": "Microsoft - Xbox",
+  "Xbox 360": "Microsoft - Xbox 360",
+  "GameCube": "Nintendo - GameCube",
+  "Wii": "Nintendo - Wii",
+  "Wii U": "Nintendo - Wii U",
+  "N64": "Nintendo - Nintendo 64",
+  "SNES": "Nintendo - Super Nintendo Entertainment System",
+  "NES": "Nintendo - Nintendo Entertainment System",
+  "Game Boy": "Nintendo - Game Boy",
+  "Game Boy Advance": "Nintendo - Game Boy Advance",
+  "DS": "Nintendo - Nintendo DS",
+  "3DS": "Nintendo - Nintendo 3DS",
+  "Genesis": "Sega - Mega Drive - Genesis",
+  "Saturn": "Sega - Saturn",
+  "Dreamcast": "Sega - Dreamcast",
+  "Atari 2600": "Atari - 2600"
+};
+function libretroImageUrl(title, platform){
+  const system = LIBRETRO_SYSTEM_MAP[platform];
+  if (!system) return null;
+  const safeName = (title || "").replace(/[&*/:`<>?\\|]/g, "_");
+  return "https://thumbnails.libretro.com/" + encodeURIComponent(system) + "/Named_Boxarts/" + encodeURIComponent(safeName) + ".png";
+}
+function tryImageLoad(url){
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(url);
+    img.onerror = () => resolve(null);
+    img.src = url;
+  });
+}
+async function fetchWikiThumb(title, year, platform){
+  const key = cacheKeyFor(title, year);
+  if (thumbCache[key] !== undefined) return thumbCache[key];
+  let src = null;
+  const libretroUrl = libretroImageUrl(title, platform);
+  if (libretroUrl) src = await tryImageLoad(libretroUrl);
+  if (!src){
+    src = await wikiSearchThumbJSONP(title, year, platform);
+  }
+  thumbCache[key] = src;
+  saveThumbCache();
+  return src;
+}
+
+// ---------- shared image bank (Firebase) — checked before ever bothering Wikipedia ----------
+function slugifyTitle(title, year){
+  const base = (title || "").trim().toLowerCase() + (year ? "_" + year : "");
+  return base.replace(/[.#$\[\]\/\s]+/g, "_").replace(/^_+|_+$/g, "") || "untitled";
+}
+function lookupSharedImage(title, year){
+  if (!fbConfig) return Promise.resolve(null);
+  try{
+    initFirebaseApp();
+    return firebase.database().ref("gameImages/" + slugifyTitle(title, year)).once("value")
+      .then(snap => snap.val() || null)
+      .catch(() => null);
+  }catch(e){
+    return Promise.resolve(null);
+  }
+}
+function contributeSharedImage(title, year, url){
+  if (!fbConfig || !url) return;
+  try{
+    initFirebaseApp();
+    firebase.database().ref("gameImages/" + slugifyTitle(title, year)).set(url).catch(() => {});
+  }catch(e){ /* best effort, never block on this */ }
+}
+
+// throttled queue so multiple lazy lookups (e.g. a full grid of cards) don't
+// fire at once and trip Wikipedia's anonymous rate limit — only used as a fallback
+// for titles the shared Firebase image bank doesn't have yet
+const thumbQueue = [];
+let thumbQueueRunning = false;
+let thumbDelay = 1000; // starting pace; adapts up/down based on outcomes
+const THUMB_DELAY_MIN = 400;
+const THUMB_DELAY_MAX = 6000;
+async function queueWikiThumb(title, year, platform){
+  const key = cacheKeyFor(title, year);
+  if (thumbCache[key] !== undefined) return thumbCache[key];
+
+  // fast path: check the shared Firebase image bank first — no throttling needed
+  const shared = await lookupSharedImage(title, year);
+  if (shared){
+    thumbCache[key] = shared;
+    saveThumbCache();
+    return shared;
+  }
+
+  // fallback: nothing shared yet, so queue a (throttled) Wikipedia lookup
+  return new Promise((resolve) => {
+    thumbQueue.push({ title, year, platform, resolve });
+    runThumbQueue();
+  });
+}
+async function runThumbQueue(){
+  if (thumbQueueRunning) return;
+  thumbQueueRunning = true;
+  try{
+    while (thumbQueue.length){
+      const { title, year, platform, resolve } = thumbQueue.shift();
+      const key = cacheKeyFor(title, year);
+      if (thumbCache[key] !== undefined){
+        resolve(thumbCache[key]);
+        continue;
+      }
+      let src = null;
+      try{
+        src = await fetchWikiThumb(title, year, platform);
+      }catch(e){
+        src = null;
+      }
+      if (src) contributeSharedImage(title, year, src); // pay it forward for next time / other users
+      resolve(src);
+      // a miss might mean "no image exists" OR a silent rate-limit — ease off a bit either way;
+      // a hit means we're in the clear, so gradually speed back up
+      thumbDelay = src
+        ? Math.max(THUMB_DELAY_MIN, thumbDelay * 0.85)
+        : Math.min(THUMB_DELAY_MAX, thumbDelay * 1.4);
+      await new Promise(r => setTimeout(r, thumbDelay));
+    }
+  } finally {
+    thumbQueueRunning = false;
+  }
+}
+
+// ---------- rendering ----------
+function filteredGames(){
+  return games.filter(g => {
+    if (platformFilter !== "All" && g.platform !== platformFilter) return false;
+    if (searchTerm && !g.title.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+    return true;
+  });
+}
+
+function thumbInnerHtml(g){
+  if (g.cover){
+    return `<img class="shell-card-cover" style="width:100%;height:100%;object-fit:cover;" src="${esc(g.cover)}" alt="" onerror="this.outerHTML=window.__thumbFallback('${esc(g.id)}')">`;
+  }
+  const cached = thumbCache[cacheKeyFor(g.title, g.year)];
+  if (cached){
+    return `<img class="shell-card-cover" style="width:100%;height:100%;object-fit:cover;" src="${esc(cached)}" alt="">`;
+  }
+  return fallbackThumbHtml(g);
+}
+function fallbackThumbHtml(g){
+  const letter = (g.title || "?").trim().charAt(0).toUpperCase();
+  return `<div class="shell-card-fallback" style="width:100%;height:100%;background:${PLATFORM_COLOR[g.platform]}">${esc(letter)}</div>`;
+}
+window.__thumbFallback = function(id){
+  const g = games.find(x => x.id === id);
+  return g ? fallbackThumbHtml(g) : "";
+};
+
+// ---------- hero + shelves ----------
+let heroIndex = 0;
+let shelfSort = { Backlog:"added", Completed:"added", Playing:"added", Dropped:"added" };
+
+function starsMini(n){ return "★★★★★".slice(0,n) + "☆☆☆☆☆".slice(0, 5-n); }
+
+function shellCardHtml(g){
+  const idx = games.findIndex(x => x.id === g.id);
+  return `
+    <div class="shell-card" data-id="${g.id}">
+      <div class="shell-card-cover shell-pixel" data-thumb-for="${g.id}">${thumbInnerHtml(g)}
+        ${g.status!=="Backlog" ? `<span class="shell-stamp">${g.status}</span>` : ""}
+      </div>
+      <p class="shell-card-title">${esc(g.title)}</p>
+      <div class="shell-card-meta">
+        <span class="shell-card-dot" style="background:${PLATFORM_COLOR[g.platform]}"></span>
+        ${g.rating>0 ? `<span class="shell-card-stars">${starsMini(g.rating).slice(0,g.rating)}</span>` : `<span class="mono" style="font-size:10px;color:var(--sh-muted)">${g.platform}</span>`}
+      </div>
+    </div>`;
+}
+
+function sortShellGames(list, mode){
+  const arr = [...list];
+  if (mode==="rating") arr.sort((a,b)=>(b.rating||0)-(a.rating||0));
+  else if (mode==="az") arr.sort((a,b)=>a.title.localeCompare(b.title));
+  else arr.sort((a,b)=>new Date(b.added||0)-new Date(a.added||0));
+  return arr;
+}
+
+function renderHero(){
+  const area = document.getElementById("heroArea");
+  const list = filteredGames();
+  const playing = list.filter(g=>g.status==="Playing");
+  if (playing.length===0){
+    const pick = list.filter(g=>g.status==="Backlog")[0];
+    area.innerHTML = pick ? `
+      <div class="shell-hero shell-pixel">
+        <p class="shell-hero-label">Nothing in progress</p>
+        <p class="shell-hero-title">Start ${esc(pick.t||pick.title)}?</p>
+        <p class="shell-hero-meta">Pulled from your Backlog</p>
+        <div class="shell-hero-actions"><button class="shell-hero-btn primary shell-pixel" id="startPlayingBtn">Mark as playing</button></div>
+      </div>` : (games.length ? "" : `<div class="empty">Catalog's empty. File your first card to start the shelf.</div>`);
+    const startBtn = document.getElementById("startPlayingBtn");
+    if (startBtn && pick) startBtn.addEventListener("click", ()=>{ pick.status="Playing"; saveGames(); renderAll(); });
+    return;
+  }
+  if (heroIndex >= playing.length) heroIndex = 0;
+  const g = playing[heroIndex];
+  area.innerHTML = `
+    <div class="shell-hero shell-pixel">
+      <div class="shell-hero-top">
+        <div class="shell-hero-cover shell-pixel" data-thumb-for="hero-${g.id}">${thumbInnerHtml(g)}</div>
+        <div>
+          <p class="shell-hero-label">Now playing</p>
+          <p class="shell-hero-title">${esc(g.title)}</p>
+          <p class="shell-hero-meta">${g.hours||0} hours logged on ${esc(g.platform)}</p>
+          <div class="shell-hero-stars">${g.rating ? starsMini(g.rating) : ""}</div>
+        </div>
+      </div>
+      <div class="shell-hero-actions">
+        <button class="shell-hero-btn shell-pixel" id="heroAddHourBtn">+1 hour</button>
+        <button class="shell-hero-btn primary shell-pixel" id="heroCompleteBtn">Mark completed</button>
+      </div>
+      ${playing.length>1 ? `<div style="display:flex;gap:5px;justify-content:center;margin-top:12px;">${playing.map((_,i)=>`<span class="hero-dot" data-i="${i}" style="width:6px;height:6px;border-radius:50%;cursor:pointer;background:${i===heroIndex?'var(--sh-fill)':'var(--sh-line)'}"></span>`).join("")}</div>` : ""}
+    </div>`;
+  document.getElementById("heroAddHourBtn").addEventListener("click", ()=>{ g.hours=(g.hours||0)+1; saveGames(); renderAll(); });
+  document.getElementById("heroCompleteBtn").addEventListener("click", ()=>{ g.status="Completed"; saveGames(); renderAll(); });
+  area.querySelectorAll(".hero-dot").forEach(d=>d.addEventListener("click", ()=>{ heroIndex=Number(d.dataset.i); renderAll(); }));
+  if (!g.cover && thumbCache[cacheKeyFor(g.title, g.year)] === undefined){
+    queueWikiThumb(g.title, g.year, g.platform).then(src => {
+      const slot = area.querySelector(`[data-thumb-for="hero-${g.id}"]`);
+      if (slot && src) slot.innerHTML = `<img style="width:100%;height:100%;object-fit:cover;border-radius:9px;" src="${esc(src)}" alt="">`;
+    });
+  }
+}
+
+function renderShelves(){
+  const area = document.getElementById("shelvesArea");
+  const list = filteredGames();
+  area.innerHTML = STATUSES.map(status=>{
+    let shelfList = list.filter(g=>g.status===status);
+    if (status==="Playing"){
+      const idsInHero = new Set(shelfList.length ? [shelfList[Math.min(heroIndex, shelfList.length-1)]?.id] : []);
+      shelfList = shelfList.filter(g=>!idsInHero.has(g.id));
+    }
+    if (shelfList.length===0) return "";
+    shelfList = sortShellGames(shelfList, shelfSort[status]);
+    const visible = shelfList.slice(0,12);
+    return `
+      <div class="shell-shelf">
+        <div class="shell-shelf-head">
+          <div style="display:flex;align-items:baseline;gap:8px;"><p class="shelf-title">${status}</p><span class="shell-count">${shelfList.length}</span></div>
+          <div class="shell-shelf-controls">
+            ${status==="Backlog" ? `<button class="shell-surprise shell-pixel" id="shellSurpriseBtn">Pull a card</button>` : ""}
+            <select class="shell-sort" data-status="${status}">
+              <option value="added" ${shelfSort[status]==='added'?'selected':''}>Recent</option>
+              <option value="rating" ${shelfSort[status]==='rating'?'selected':''}>Rating</option>
+              <option value="az" ${shelfSort[status]==='az'?'selected':''}>A–Z</option>
+            </select>
+            ${shelfList.length>12 ? `<button class="shell-seeall" data-status="${status}">See all</button>` : ""}
+          </div>
+        </div>
+        <div class="shell-scroll">${visible.map(g=>shellCardHtml(g)).join("")}</div>
+        <div class="shelf-ledge"></div>
+      </div>`;
+  }).join("");
+
+  if (games.length && list.length===0){
+    area.innerHTML = `<div class="empty">No cards match this search.</div>`;
+  }
+
+  area.querySelectorAll("select.shell-sort").forEach(s=>s.addEventListener("change", ()=>{
+    shelfSort[s.dataset.status]=s.value; renderAll();
+  }));
+  area.querySelectorAll(".shell-seeall").forEach(b=>b.addEventListener("click", ()=>openFullGridModal(b.dataset.status)));
+  const sb = document.getElementById("shellSurpriseBtn");
+  if (sb) sb.addEventListener("click", pickRandom);
+  area.querySelectorAll(".shell-card").forEach(c=>c.addEventListener("click", ()=>openForm(games.find(g=>g.id===c.dataset.id))));
+
+  visibleCardsList(list).forEach(g => {
+    if (!g.cover && thumbCache[cacheKeyFor(g.title, g.year)] === undefined){
+      queueWikiThumb(g.title, g.year, g.platform).then(src => {
+        const slot = area.querySelector(`[data-thumb-for="${g.id}"]`);
+        if (slot && src) slot.innerHTML = `<img style="width:100%;height:100%;object-fit:cover;border-radius:9px;" src="${esc(src)}" alt="">`;
+      });
+    }
+  });
+}
+function visibleCardsList(list){
+  // only queue thumbnail lookups for cards actually rendered on screen (first 12 per shelf)
+  const out = [];
+  STATUSES.forEach(status=>{
+    const shelfList = sortShellGames(list.filter(g=>g.status===status), shelfSort[status]).slice(0,12);
+    out.push(...shelfList);
+  });
+  return out;
+}
+
+function openFullGridModal(status){
+  const list = sortShellGames(filteredGames().filter(g=>g.status===status), shelfSort[status]);
+  document.getElementById("randomOverlay").classList.add("hidden");
+  const overlay = document.getElementById("fullGridOverlay");
+  document.getElementById("fullGridTitle").textContent = status;
+  document.getElementById("fullGridBody").innerHTML = `<div class="shell-full-grid">${list.map(g=>shellCardHtml(g)).join("")}</div>`;
+  document.getElementById("fullGridBody").querySelectorAll(".shell-card").forEach(c=>c.addEventListener("click", ()=>{
+    overlay.classList.add("hidden");
+    openForm(games.find(g=>g.id===c.dataset.id));
+  }));
+  overlay.classList.remove("hidden");
+}
+
+let retroMenuOpen = false;
+function renderFilterChips(){
+  const presentPlatforms = new Set(games.map(g=>g.platform));
+  const currentChips = CURRENT_PLATFORMS.filter(p=>presentPlatforms.has(p) || platformFilter===p);
+  const retroActive = RETRO_PLATFORMS.includes(platformFilter);
+
+  let html = `<button class="shell-chip ${platformFilter==='All'?'active':''}" data-p="All">All</button>`;
+  html += currentChips.map(p => `<button class="shell-chip ${p===platformFilter?'active':''}" data-p="${p}">${p}</button>`).join("");
+  html += `<button class="shell-chip ${retroActive?'active':''}" id="retroChipBtn">${retroActive?platformFilter:'Retro'} &#9662;</button>`;
+  document.getElementById("chipRow").innerHTML = html;
+
+  document.querySelectorAll(".shell-chip[data-p]").forEach(b=>b.addEventListener("click", ()=>{
+    platformFilter = b.dataset.p; retroMenuOpen=false; renderAll();
+  }));
+  const retroBtn = document.getElementById("retroChipBtn");
+  retroBtn.addEventListener("click", (e)=>{
+    e.stopPropagation(); retroMenuOpen = !retroMenuOpen; renderFilterChips();
+  });
+  if (retroMenuOpen){
+    const rect = retroBtn.getBoundingClientRect();
+    document.getElementById("retroMenuRoot").innerHTML = `
+      <div class="shell-retro-menu shell-pixel" style="position:fixed;top:${rect.bottom+6}px;left:${rect.left}px;z-index:30;">
+        ${RETRO_PLATFORMS.map(c=>`<button class="shell-retro-item ${c===platformFilter?'active':''}" data-p="${c}">${esc(c)}</button>`).join("")}
+      </div>`;
+    document.querySelectorAll(".shell-retro-item").forEach(b=>b.addEventListener("click", (e)=>{
+      e.stopPropagation(); platformFilter = b.dataset.p; retroMenuOpen=false; renderAll();
+    }));
+  } else {
+    document.getElementById("retroMenuRoot").innerHTML = "";
+  }
+}
+document.addEventListener("click", ()=>{ if (retroMenuOpen){ retroMenuOpen=false; renderFilterChips(); } });
+
+function renderAll(){
+  renderFilterChips();
+  renderHero();
+  renderShelves();
+}
+
+// ---------- form modal ----------
+let formPlatform = "PS5";
+let formStatus = "Backlog";
+let formRating = 0;
+
+function renderStarPicker(){
+  const wrap = document.getElementById("ratingPicker");
+  wrap.innerHTML = [1,2,3,4,5].map(n => {
+    const filled = n <= formRating;
+    return `<button type="button" class="star-btn${filled ? ' filled' : ''}" data-star="${n}">${filled ? '★' : '☆'}</button>`;
+  }).join("");
+  wrap.querySelectorAll(".star-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const n = Number(btn.dataset.star);
+      formRating = (formRating === n) ? 0 : n; // click same star again to clear
+      renderStarPicker();
+    });
+  });
+}
+
+function starsHtml(rating){
+  return [1,2,3,4,5].map(n =>
+    n <= rating ? `<span class="filled-star">★</span>` : `<span class="empty-star">★</span>`
+  ).join("");
+}
+
+function renderFormChips(){
+  const renderGroup = (containerId, list) => {
+    const wrap = document.getElementById(containerId);
+    wrap.innerHTML = list.map(p => {
+      const active = formPlatform === p;
+      return `<button type="button" class="chip" data-platform="${p}" style="border-color:${PLATFORM_COLOR[p]};color:${active?'#fff':'#14181F'};background:${active?PLATFORM_COLOR[p]:'transparent'}">${p}</button>`;
+    }).join("");
+    wrap.querySelectorAll(".chip").forEach(btn => {
+      btn.addEventListener("click", () => { formPlatform = btn.dataset.platform; renderFormChips(); });
+    });
+  };
+  renderGroup("platformChipsCurrent", CURRENT_PLATFORMS);
+  renderGroup("platformChipsRetro", RETRO_PLATFORMS);
+
+  const sWrap = document.getElementById("statusChips");
+  sWrap.innerHTML = STATUSES.map(s => {
+    const active = formStatus === s;
+    return `<button type="button" class="chip" data-status="${s}" style="border-color:${STATUS_COLOR[s]};color:${active?'#fff':'#14181F'};background:${active?STATUS_COLOR[s]:'transparent'}">${s}</button>`;
+  }).join("");
+  sWrap.querySelectorAll(".chip").forEach(btn => {
+    btn.addEventListener("click", () => { formStatus = btn.dataset.status; renderFormChips(); });
+  });
+}
+
+function openForm(game){
+  editingId = game ? game.id : null;
+  document.getElementById("formTitle").textContent = game ? "Edit card" : "File a new card";
+  document.getElementById("titleInput").value = game ? game.title : "";
+  document.getElementById("coverInput").value = game ? (game.cover || "") : "";
+  document.getElementById("hoursInput").value = game && game.hours ? game.hours : "";
+  document.getElementById("yearInput").value = game && game.year ? game.year : "";
+  document.getElementById("notesInput").value = game ? (game.notes || "") : "";
+  formPlatform = game ? game.platform : "PS5";
+  formStatus = game ? game.status : "Backlog";
+  formRating = game ? (game.rating || 0) : 0;
+  document.getElementById("deleteBtn").classList.toggle("hidden", !game);
+  document.getElementById("saveBtn").textContent = game ? "Save" : "File card";
+  document.getElementById("gsInput").value = "";
+  document.getElementById("gsResults").classList.add("hidden");
+  renderFormChips();
+  renderStarPicker();
+  document.getElementById("formOverlay").classList.remove("hidden");
+}
+function closeForm(){
+  document.getElementById("formOverlay").classList.add("hidden");
+  editingId = null;
+}
+
+function saveForm(){
+  const title = document.getElementById("titleInput").value.trim();
+  if (!title) return;
+  const cover = document.getElementById("coverInput").value.trim();
+  const hoursRaw = document.getElementById("hoursInput").value.trim();
+  const hours = hoursRaw ? Number(hoursRaw) : null;
+  const yearRaw = document.getElementById("yearInput").value.trim();
+  const year = yearRaw ? Number(yearRaw) : null;
+  const notes = document.getElementById("notesInput").value.trim();
+
+  if (editingId){
+    const g = games.find(x => x.id === editingId);
+    Object.assign(g, {title, platform: formPlatform, status: formStatus, cover, notes, rating: formRating, hours, year});
+  } else {
+    games.unshift({
+      id: uid(), title, platform: formPlatform,
+      status: formStatus, cover, notes, rating: formRating, hours, year, added: new Date().toISOString()
+    });
+  }
+  saveGames();
+  if (cover) contributeSharedImage(title, year, cover);
+  closeForm();
+  renderAll();
+}
+
+function deleteCurrent(){
+  if (!editingId) return;
+  games = games.filter(g => g.id !== editingId);
+  saveGames();
+  closeForm();
+  renderAll();
+}
+
+// ---------- built-in title search ----------
+function runGameSearch(query){
+  const resultsEl = document.getElementById("gsResults");
+  const q = query.trim().toLowerCase();
+  if (q.length < 2){
+    resultsEl.classList.add("hidden");
+    resultsEl.innerHTML = "";
+    return;
+  }
+  const seenTitles = new Set();
+  const matches = GAME_DB.filter(g => {
+    if (!g.t.toLowerCase().includes(q)) return false;
+    const key = g.t.toLowerCase();
+    if (seenTitles.has(key)) return false;
+    seenTitles.add(key);
+    return true;
+  }).slice(0, 8);
+  if (matches.length === 0){
+    resultsEl.classList.add("hidden");
+    resultsEl.innerHTML = "";
+    return;
+  }
+  resultsEl.innerHTML = matches.map((m, i) => {
+    const cached = thumbCache[cacheKeyFor(m.t, m.y)];
+    const swatchInner = cached
+      ? `<img src="${esc(cached)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:3px;">`
+      : "";
+    return `
+    <button type="button" class="gs-result" data-idx="${i}">
+      <div class="gs-swatch" data-gs-thumb="${i}" style="background:${PLATFORM_COLOR[m.p]};overflow:hidden;">${swatchInner}</div>
+      <div>
+        <div class="gs-name">${esc(m.t)}</div>
+        <div class="gs-meta">${m.y || "—"} · ${m.p}</div>
+      </div>
+    </button>`;
+  }).join("");
+  resultsEl.classList.remove("hidden");
+  resultsEl.querySelectorAll(".gs-result").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const m = matches[Number(btn.dataset.idx)];
+      document.getElementById("titleInput").value = m.t;
+      document.getElementById("yearInput").value = m.y || "";
+      formPlatform = m.p;
+      renderFormChips();
+      document.getElementById("gsInput").value = "";
+      resultsEl.classList.add("hidden");
+      resultsEl.innerHTML = "";
+    });
+  });
+  // lazily fetch real thumbnails for the visible results (throttled)
+  matches.forEach((m, i) => {
+    const key = cacheKeyFor(m.t, m.y);
+    if (thumbCache[key] === undefined){
+      queueWikiThumb(m.t, m.y, m.p).then(src => {
+        if (!src) return;
+        const slot = resultsEl.querySelector(`[data-gs-thumb="${i}"]`);
+        if (slot) slot.innerHTML = `<img src="${esc(src)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:3px;">`;
+      });
+    }
+  });
+}
+
+// ---------- random pick ----------
+function pickRandom(){
+  const pool = games.filter(g => g.status === "Backlog");
+  if (pool.length === 0){
+    closeForm();
+    return;
+  }
+  const g = pool[Math.floor(Math.random() * pool.length)];
+  document.getElementById("randomTitle").textContent = g.title;
+  document.getElementById("randomDot").style.background = PLATFORM_COLOR[g.platform];
+  document.getElementById("randomPlat").textContent = g.platform + (g.subPlatform ? " · " + g.subPlatform : "");
+  document.getElementById("randomOverlay").classList.remove("hidden");
+}
+
+// ---------- live shared lists (Firebase Realtime Database) ----------
+const FB_CONFIG_KEY = "backlog-firebase-config-v1";
+const FB_CODE_KEY = "backlog-firebase-code-v1";
+const BUILT_IN_FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDUjjPnVgkWgqQK27b5XyZ_W8FNlP28C9c",
+  authDomain: "backlogyahknow.firebaseapp.com",
+  databaseURL: "https://backlogyahknow-default-rtdb.firebaseio.com",
+  projectId: "backlogyahknow",
+  storageBucket: "backlogyahknow.firebasestorage.app",
+  messagingSenderId: "450030904414",
+  appId: "1:450030904414:web:1d0c975c731f7c1b5000cf"
+};
+let fbConfig = null;
+let fbCode = localStorage.getItem(FB_CODE_KEY) || "";
+let fbInitialized = false;
+let fbListenerRef = null;
+
+function loadFirebaseConfig(){
+  try{
+    const raw = localStorage.getItem(FB_CONFIG_KEY);
+    fbConfig = raw ? JSON.parse(raw) : BUILT_IN_FIREBASE_CONFIG;
+  }catch(e){ fbConfig = BUILT_IN_FIREBASE_CONFIG; }
+}
+
+function parseFirebaseConfigText(text){
+  const start = text.indexOf("{");
+  const end = text.lastIndexOf("}");
+  if (start === -1 || end === -1 || end <= start) return null;
+  const objText = text.slice(start, end + 1);
+  try{
+    const obj = new Function("return (" + objText + ")")();
+    if (obj && typeof obj === "object" && obj.databaseURL) return obj;
+    return null;
+  }catch(e){ return null; }
+}
+
+function initFirebaseApp(){
+  if (!fbConfig || fbInitialized) return;
+  try{
+    firebase.initializeApp(fbConfig);
+    fbInitialized = true;
+  }catch(e){ /* already initialized or bad config */ }
+}
+
+function randomCode(){
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let s = "";
+  for (let i = 0; i < 6; i++) s += chars[Math.floor(Math.random() * chars.length)];
+  return s;
+}
+
+function detachLiveListener(){
+  if (fbListenerRef){ fbListenerRef.off(); fbListenerRef = null; }
+}
+
+function attachLiveListener(){
+  detachLiveListener();
+  fbListenerRef = firebase.database().ref("backlogs/" + fbCode);
+  fbListenerRef.on("value", snap => {
+    const val = snap.val();
+    games = Array.isArray(val) ? val : [];
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(games));
+    renderAll();
+  }, () => {
+    setSyncStatus("err", "Lost connection to the live list — check your Firebase rules.");
+  });
+}
+
+function pushToFirebase(){
+  if (!fbCode || !fbConfig || !fbInitialized) return;
+  try{ firebase.database().ref("backlogs/" + fbCode).set(games); }catch(e){}
+}
+
+async function createSharedList(){
+  if (!fbConfig) return;
+  initFirebaseApp();
+  setSyncStatus("pending", "Creating your list…");
+  try{
+    const code = randomCode();
+    await firebase.database().ref("backlogs/" + code).set(games);
+    fbCode = code;
+    localStorage.setItem(FB_CODE_KEY, fbCode);
+    attachLiveListener();
+    renderSyncModal();
+    updateSyncPill();
+    setSyncStatus("ok", "Live! Share this code with friends.");
+  }catch(e){
+    setSyncStatus("err", "Couldn't create the list — double-check your Firebase rules.");
+  }
+}
+
+async function connectSharedList(code){
+  const trimmed = code.trim().toUpperCase();
+  if (!trimmed || !fbConfig) return;
+  initFirebaseApp();
+  setSyncStatus("pending", "Looking up that code…");
+  try{
+    const snap = await firebase.database().ref("backlogs/" + trimmed).once("value");
+    const val = snap.val();
+    if (val === null){
+      setSyncStatus("err", "No list found for that code.");
+      return;
+    }
+    games = Array.isArray(val) ? val : [];
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(games));
+    fbCode = trimmed;
+    localStorage.setItem(FB_CODE_KEY, fbCode);
+    attachLiveListener();
+    renderAll();
+    renderSyncModal();
+    updateSyncPill();
+    setSyncStatus("ok", "Connected — live with anyone else using this code.");
+  }catch(e){
+    setSyncStatus("err", "Couldn't reach the list. Check the code and your connection.");
+  }
+}
+
+function disconnectSharedList(){
+  detachLiveListener();
+  fbCode = "";
+  localStorage.removeItem(FB_CODE_KEY);
+  renderSyncModal();
+  updateSyncPill();
+}
+
+function forgetFirebaseConfig(){
+  disconnectSharedList();
+  fbConfig = BUILT_IN_FIREBASE_CONFIG;
+  fbInitialized = false;
+  localStorage.removeItem(FB_CONFIG_KEY);
+  renderSyncModal();
+}
+
+// ---------- move to another device (export/import file — always available, no setup required) ----------
+function exportList(){
+  try{
+    const payload = JSON.stringify(games, null, 2);
+    const blob = new Blob([payload], {type: "application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "yahknowbacklog-export.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setSyncStatus("ok", "Downloaded. Move this file to your other device and import it there.");
+  }catch(e){
+    setSyncStatus("err", "Couldn't create the export file.");
+  }
+}
+
+function importList(file){
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const parsed = JSON.parse(reader.result);
+      if (!Array.isArray(parsed)) throw new Error("not a list");
+      games = parsed;
+      saveGames();
+      renderAll();
+      setSyncStatus("ok", `Imported ${parsed.length} game${parsed.length === 1 ? "" : "s"}.`);
+    }catch(e){
+      setSyncStatus("err", "That file doesn't look like a valid export.");
+    }
+  };
+  reader.onerror = () => setSyncStatus("err", "Couldn't read that file.");
+  reader.readAsText(file);
+}
+
+function setSyncStatus(kind, msg){
+  const el = document.getElementById("syncStatusMsg");
+  if (!el) return;
+  el.textContent = msg;
+  el.className = "sync-status " + kind;
+}
+
+function updateSyncPill(){
+  const label = document.getElementById("syncPillLabel");
+  if (!label) return;
+  label.innerHTML = fbCode
+    ? `<span class="live-dot"></span>Live · ${esc(fbCode)}`
+    : "Move to another device";
+}
+
+function renderSyncModal(){
+  const body = document.getElementById("syncBody");
+
+  const exportImportHtml = `
+    <div class="sync-divider">or move a copy manually</div>
+    <div class="sync-section">
+      <div class="sync-row">
+        <button class="btn btn-outline full" id="exportBtn" style="width:100%;justify-content:center;">Export (.json)</button>
+        <button class="btn btn-outline full" id="importBtn" style="width:100%;justify-content:center;">Import (.json)</button>
+      </div>
+      <div class="sync-hint" style="margin-top:8px;">A one-time file copy, no live updates — useful as a backup either way.</div>
+    </div>
+  `;
+
+  if (!fbConfig){
+    body.innerHTML = `
+      <div class="sync-section">
+        <label class="field-label">Connect Firebase for live sharing</label>
+        <div class="sync-hint">Paste the whole "firebaseConfig" block from your Firebase project's web app settings.</div>
+        <textarea id="fbConfigInput" class="config-textarea mb3" rows="7" placeholder="const firebaseConfig = {&#10;  apiKey: &quot;...&quot;,&#10;  databaseURL: &quot;...&quot;,&#10;  ...&#10;};"></textarea>
+        <button class="btn btn-amber full" id="fbConnectBtn" style="width:100%;justify-content:center;">Connect Firebase</button>
+        <div id="syncStatusMsg" class="sync-status"></div>
+      </div>
+      ${exportImportHtml}
+    `;
+    document.getElementById("fbConnectBtn").addEventListener("click", () => {
+      const text = document.getElementById("fbConfigInput").value;
+      const parsed = parseFirebaseConfigText(text);
+      if (!parsed){
+        setSyncStatus("err", "Couldn't read that config — make sure you pasted the whole block, including databaseURL.");
+        return;
+      }
+      fbConfig = parsed;
+      localStorage.setItem(FB_CONFIG_KEY, JSON.stringify(fbConfig));
+      renderSyncModal();
+    });
+  } else if (!fbCode){
+    body.innerHTML = `
+      <div class="sync-section">
+        <div class="sync-hint">Create a live list, then share the code with friends — everyone sees updates instantly.</div>
+        <button class="btn btn-amber full" id="createListBtn" style="width:100%;justify-content:center;margin-top:10px;">Create a shared list</button>
+      </div>
+      <div class="sync-divider">or</div>
+      <div class="sync-section">
+        <label class="field-label">Join with a code</label>
+        <div class="sync-row">
+          <input id="joinCodeInput" placeholder="Paste a code">
+          <button class="btn btn-ink" id="joinCodeBtn">Join</button>
+        </div>
+        <div class="sync-hint">This replaces what's on this device with that shared list.</div>
+      </div>
+      <div id="syncStatusMsg" class="sync-status"></div>
+      <div class="sync-section" style="margin-top:14px;">
+        <button class="link-btn" id="forgetConfigBtn">Use a different Firebase project</button>
+      </div>
+      ${exportImportHtml}
+    `;
+    document.getElementById("createListBtn").addEventListener("click", createSharedList);
+    document.getElementById("joinCodeBtn").addEventListener("click", () => {
+      connectSharedList(document.getElementById("joinCodeInput").value);
+    });
+    document.getElementById("forgetConfigBtn").addEventListener("click", forgetFirebaseConfig);
+  } else {
+    body.innerHTML = `
+      <div class="sync-section">
+        <label class="field-label"><span class="live-dot"></span>Live shared list</label>
+        <div class="sync-code-box">
+          <span>${esc(fbCode)}</span>
+          <button class="copy-btn" id="copyCodeBtn" title="Copy code">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          </button>
+        </div>
+        <div class="sync-hint">Anyone who enters this code sees and edits this same list live. Don't put anything sensitive in it.</div>
+        <div id="syncStatusMsg" class="sync-status"></div>
+      </div>
+      <div class="form-actions" style="margin-top:16px;">
+        <button class="delete-link" id="disconnectBtn">Disconnect</button>
+      </div>
+      ${exportImportHtml}
+    `;
+    document.getElementById("copyCodeBtn").addEventListener("click", () => {
+      navigator.clipboard.writeText(fbCode).then(() => setSyncStatus("ok", "Copied to clipboard"));
+    });
+    document.getElementById("disconnectBtn").addEventListener("click", disconnectSharedList);
+  }
+
+  document.getElementById("exportBtn").addEventListener("click", exportList);
+  document.getElementById("importBtn").addEventListener("click", () => {
+    document.getElementById("importFileInput").click();
+  });
+}
+
+
+document.getElementById("searchInput").addEventListener("input", e => { searchTerm = e.target.value; renderAll(); });
+document.getElementById("addBtn").addEventListener("click", () => openForm(null));
+document.getElementById("formClose").addEventListener("click", closeForm);
+document.getElementById("cancelBtn").addEventListener("click", closeForm);
+document.getElementById("saveBtn").addEventListener("click", saveForm);
+document.getElementById("deleteBtn").addEventListener("click", deleteCurrent);
+document.getElementById("formOverlay").addEventListener("click", e => { if (e.target.id === "formOverlay") closeForm(); });
+document.getElementById("gsInput").addEventListener("input", e => runGameSearch(e.target.value));
+document.getElementById("pullAgainBtn").addEventListener("click", pickRandom);
+document.getElementById("closeRandomBtn").addEventListener("click", () => document.getElementById("randomOverlay").classList.add("hidden"));
+document.getElementById("randomOverlay").addEventListener("click", e => { if (e.target.id === "randomOverlay") e.target.classList.add("hidden"); });
+document.getElementById("fullGridOverlay").addEventListener("click", e => { if (e.target.id === "fullGridOverlay") e.target.classList.add("hidden"); });
+document.getElementById("fullGridClose").addEventListener("click", () => document.getElementById("fullGridOverlay").classList.add("hidden"));
+document.getElementById("syncPillBtn").addEventListener("click", () => {
+  renderSyncModal();
+  heartClicks = 0; heartUnlocked = false;
+  document.getElementById("heartBtn").classList.remove("filled");
+  document.getElementById("heartMsg").classList.remove("shown");
+  document.getElementById("heartMsg").textContent = "";
+  document.getElementById("syncOverlay").classList.remove("hidden");
+});
+document.getElementById("syncClose").addEventListener("click", () => document.getElementById("syncOverlay").classList.add("hidden"));
+document.getElementById("syncOverlay").addEventListener("click", e => { if (e.target.id === "syncOverlay") e.target.classList.add("hidden"); });
+document.getElementById("importFileInput").addEventListener("change", e => {
+  const file = e.target.files[0];
+  importList(file);
+  e.target.value = "";
+});
+
+// ---------- heart easter egg ----------
+let heartClicks = 0;
+let heartUnlocked = false;
+document.getElementById("heartBtn").addEventListener("click", (e) => {
+  e.target.classList.add("pulse");
+  setTimeout(() => e.target.classList.remove("pulse"), 260);
+  if (heartUnlocked) return;
+  heartClicks++;
+  if (heartClicks >= 10){
+    heartUnlocked = true;
+    document.getElementById("heartBtn").classList.add("filled");
+    document.getElementById("heartMsg").textContent = "I Love You Darling";
+    document.getElementById("heartMsg").classList.add("shown");
+  }
+});
+
+// ---------- theme toggle (light / dark / retro) ----------
+const SHELL_THEME_ICONS = { light:"&#9788;", dark:"&#9789;", retro:"&#9638;" };
+const SHELL_THEME_ORDER = ["light","dark","retro"];
+function applyShellTheme(theme){
+  document.documentElement.dataset.shell = theme;
+  document.getElementById("themeIcon").innerHTML = SHELL_THEME_ICONS[theme];
+  localStorage.setItem("backlog-shell-theme", theme);
+}
+applyShellTheme(localStorage.getItem("backlog-shell-theme") || "light");
+document.getElementById("themeBtn").addEventListener("click", () => {
+  const current = document.documentElement.dataset.shell;
+  const next = SHELL_THEME_ORDER[(SHELL_THEME_ORDER.indexOf(current)+1) % SHELL_THEME_ORDER.length];
+  applyShellTheme(next);
+});
+
+loadThumbCache();
+loadGames();
+loadFirebaseConfig();
+if (fbConfig && fbCode){
+  initFirebaseApp();
+  attachLiveListener();
+}
+updateSyncPill();
+renderAll();
+</script>
+</body>
+</html>
